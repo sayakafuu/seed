@@ -1,0 +1,27 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>種</title><style>
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:linear-gradient(180deg,#fff8fd,#f7fbff);color:#2b2633}
+header{padding:28px 20px 18px;background:rgba(255,255,255,.85);position:sticky;top:0;backdrop-filter:blur(14px);border-bottom:1px solid #eee}
+h1{font-size:34px;margin:0 0 8px}.sub{color:#7b7280;font-size:14px;line-height:1.6}
+main{padding:18px;display:flex;flex-direction:column;gap:14px}.card{background:white;border-radius:24px;padding:16px;box-shadow:0 12px 30px #0001;border-left:9px solid var(--c,#7fd7da)}
+.title{font-weight:800;font-size:19px}.mini{color:#7b7280;font-size:13px;margin-top:8px}.step{background:#f7f3fa;border-radius:16px;padding:12px;margin-top:12px;font-weight:700}
+button{border:0;border-radius:999px;padding:13px 16px;font-weight:800;font-size:16px}.add{background:#302938;color:white;width:100%;margin-top:12px}.done{background:#6b5a80;color:white;width:100%;margin-top:12px}
+.row{display:flex;gap:10px}.row button{flex:1;background:white;border:1px solid #eee;color:#403748}.del{background:#fff0f3!important}
+dialog{border:0;border-radius:26px;padding:18px;width:calc(100% - 36px);box-shadow:0 20px 60px #0003}input,textarea{width:100%;box-sizing:border-box;border:1px solid #e8dfe8;border-radius:16px;padding:12px;margin:7px 0 12px;font-size:16px}.colors{display:flex;gap:8px}.color{width:34px;height:34px;border-radius:12px}
+</style></head><body><header><h1>種</h1><div class="sub">思いついたことを置いて、次の一手で少しずつ前へ。</div><button class="add" onclick="openAdd()">＋ 種を追加</button></header><main id="list"></main>
+<dialog id="dlg"><h2>種を追加</h2><input id="t" placeholder="タイトル"><textarea id="k" placeholder="きっかけ"></textarea><textarea id="s" placeholder="次の一手"></textarea><div class="colors" id="colors"></div><div class="row"><button onclick="dlg.close()">閉じる</button><button onclick="saveSeed()">保存</button></div></dialog>
+<dialog id="nextDlg"><h2>一手完了</h2><textarea id="memo" placeholder="メモ"></textarea><textarea id="next" placeholder="次の一手"></textarea><div class="row"><button onclick="nextDlg.close()">閉じる</button><button onclick="finishStep()">次へ</button></div></dialog>
+<script>
+const C=["#7fd7da","#ff9fb8","#bff0dd","#b9ddff","#d8c8ff","#fff0bd","#ffbe88"];let color=C[0],now=null;
+let seeds=JSON.parse(localStorage.seeds||"null")||[
+{t:"ふるさと納税する",k:"今年こそ早めにやりたい",s:"上限金額を確認する",c:C[0],done:[]},
+{t:"図鑑",k:"友達におすすめされた",s:"本屋で見てみる",c:C[3],done:[]}
+];
+function render(){list.innerHTML="";seeds.forEach((x,i)=>{let d=document.createElement("div");d.className="card";d.style="--c:"+x.c;d.innerHTML=`<div class=title>${x.t}</div><div class=mini>きっかけ：${x.k||""}</div><div class=step>次の一手：${x.s||"未設定"}</div>${(x.done||[]).slice(-2).map(a=>`<div class=mini>終了：${a}</div>`).join("")}<div class=row><button class=done onclick="openNext(${i})">一手完了</button><button class=del onclick="del(${i})">削除</button></div>`;list.appendChild(d)})}
+function openAdd(){t.value=k.value=s.value="";drawColors();dlg.showModal()}
+function drawColors(){colors.innerHTML="";C.forEach(c=>{let b=document.createElement("button");b.className="color";b.style.background=c;b.onclick=()=>color=c;colors.appendChild(b)})}
+function saveSeed(){seeds.unshift({t:t.value,k:k.value,s:s.value,c:color,done:[]});localStorage.seeds=JSON.stringify(seeds);dlg.close();render()}
+function openNext(i){now=i;memo.value=next.value="";nextDlg.showModal()}
+function finishStep(){let x=seeds[now];x.done=x.done||[];x.done.push(x.s+(memo.value?" / "+memo.value:""));x.s=next.value;localStorage.seeds=JSON.stringify(seeds);nextDlg.close();render()}
+function del(i){if(confirm("削除しますか？")){seeds.splice(i,1);localStorage.seeds=JSON.stringify(seeds);render()}}
+render();
+</script></body></html>
