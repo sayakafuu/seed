@@ -1,5 +1,5 @@
 const C = ["#76d9dc","#ff9fb8","#bff0dd","#b9ddff","#d8c8ff","#fff0bd","#ffbe88","#c9e76b"];
-const K = "tane_split_v01";
+const K = "tane_v2_magic";
 
 let data = JSON.parse(localStorage[K] || "null") || {
   cats:["やること","行きたい・食べたい","気になる","待ち"],
@@ -17,38 +17,46 @@ let finishTarget = null;
 let col = C[0];
 let longTimer = null;
 
+const app = document.getElementById("app");
+const addTop = document.getElementById("addTop");
+const archiveBtn = document.getElementById("archiveBtn");
+const editDialog = document.getElementById("editDialog");
+const nextDialog = document.getElementById("nextDialog");
+const finishDialog = document.getElementById("finishDialog");
+const archiveDialog = document.getElementById("archiveDialog");
+
 function save(){
   localStorage[K] = JSON.stringify(data);
+}
+
+function esc(s){
+  return String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
 }
 
 function render(){
   app.innerHTML = "";
 
-  data.cats.forEach(catName => {
-    const items = data.items.filter(x => x.c === catName);
+  data.cats.forEach(cat => {
+    const items = data.items.filter(x => x.c === cat);
 
     const group = document.createElement("section");
     group.className = "group";
-
     group.innerHTML = `
       <div class="groupHead">
-        <div class="groupName">${catName}</div>
+        <div class="groupName">${esc(cat)}</div>
         <div class="groupCount">${items.length}</div>
         <button class="miniPlus">＋</button>
       </div>
       <div class="list"></div>
     `;
 
-    group.querySelector(".miniPlus").onclick = () => openEdit(null, catName);
+    group.querySelector(".miniPlus").onclick = () => openEdit(null, cat);
 
     const list = group.querySelector(".list");
-
-    if(items.length === 0){
-      const empty = document.createElement("div");
-      empty.className = "memo";
-      empty.textContent = "";
-      list.appendChild(empty);
-    }
 
     items.forEach(item => {
       list.appendChild(createRow(item, data.items.indexOf(item)));
@@ -66,15 +74,14 @@ function createRow(item, index){
     <button class="action">✨</button>
     <div class="item" style="--c:${item.col}">
       <div class="inner">
-        <div class="title">${item.t}</div>
-        <div class="now">${item.n || ""}</div>
-        <div class="memo">${item.m || ""}</div>
+        <div class="title">${esc(item.t)}</div>
+        <div class="now">${esc(item.n)}</div>
+        <div class="memo">${esc(item.m)}</div>
       </div>
     </div>
   `;
 
   const card = row.querySelector(".item");
-
   let startX = 0;
   let dx = 0;
   let moved = false;
@@ -94,7 +101,7 @@ function createRow(item, index){
   card.addEventListener("touchmove", e => {
     dx = e.touches[0].clientX - startX;
 
-    if(Math.abs(dx) > 12){
+    if(Math.abs(dx) > 10){
       moved = true;
       clearTimeout(longTimer);
     }
@@ -128,29 +135,31 @@ function createRow(item, index){
   return row;
 }
 
-function openEdit(index, catName){
+function openEdit(index, cat){
   cur = index;
 
   const item = index == null
-    ? {t:"", c:catName || data.cats[0], n:"", m:"", col:C[0], log:[]}
+    ? {t:"", c:cat || data.cats[0], n:"", m:"", col:C[0], log:[]}
     : data.items[index];
+
+  col = item.col || C[0];
 
   editDialog.innerHTML = `
     <h2>${index == null ? "＋" : "…"}</h2>
 
     <label>タイトル</label>
-    <input id="editTitle" value="${escapeHtml(item.t || "")}">
+    <input id="editTitle" value="${esc(item.t)}">
 
     <label>カテゴリ</label>
     <select id="editCat">
-      ${data.cats.map(c => `<option ${c === item.c ? "selected" : ""}>${c}</option>`).join("")}
+      ${data.cats.map(c => `<option ${c === item.c ? "selected" : ""}>${esc(c)}</option>`).join("")}
     </select>
 
     <label>今できること</label>
-    <textarea id="editNow" rows="2">${escapeHtml(item.n || "")}</textarea>
+    <textarea id="editNow" rows="2">${esc(item.n)}</textarea>
 
     <label>メモ</label>
-    <textarea id="editMemo" rows="2">${escapeHtml(item.m || "")}</textarea>
+    <textarea id="editMemo" rows="2">${esc(item.m)}</textarea>
 
     <label>色</label>
     <div class="colors" id="colorBox"></div>
@@ -161,7 +170,6 @@ function openEdit(index, catName){
     </div>
   `;
 
-  col = item.col || C[0];
   drawColors();
   editDialog.showModal();
 }
@@ -210,7 +218,6 @@ function saveEdit(){
 function openNext(){
   nextDialog.innerHTML = `
     <h2>✨</h2>
-
     <label>次できること</label>
     <textarea id="nextText" rows="3" autofocus></textarea>
 
@@ -235,8 +242,8 @@ function saveNext(){
   }
 
   item.n = next;
-
   save();
+
   nextDialog.close();
   render();
   sparkle(window.innerWidth / 2, window.innerHeight / 2);
@@ -259,17 +266,14 @@ function openFinish(){
 function finishConfirmed(){
   if(finishTarget == null) return;
 
-  const item = data.items.splice(finishTarget, 1)[0];
-  data.done.unshift({
-    ...item,
-    at:new Date().toISOString()
-  });
+  const item = data.items.splice(finishTarget,1)[0];
+  data.done.unshift({...item, at:new Date().toISOString()});
 
   save();
   finishTarget = null;
+
   finishDialog.close();
   render();
-
   sparkle(window.innerWidth - 35, window.innerHeight - 45);
 }
 
@@ -291,11 +295,11 @@ function showDone(){
       const row = document.createElement("div");
       row.className = "oldRow";
       row.innerHTML = `
-        <span class="oldTitle">${escapeHtml(item.t)}</span>
+        <span class="oldTitle">${esc(item.t)}</span>
         <button class="oldDel">×</button>
       `;
       row.querySelector(".oldDel").onclick = () => {
-        data.done.splice(index, 1);
+        data.done.splice(index,1);
         save();
         showDone();
       };
@@ -306,24 +310,16 @@ function showDone(){
   archiveDialog.showModal();
 }
 
-function sparkle(x, y){
-  ["✦","･","✧","✦"].forEach((s, i) => {
+function sparkle(x,y){
+  ["✦","･","✧","✦"].forEach((s,i) => {
     const e = document.createElement("div");
     e.className = "spark";
     e.textContent = s;
     e.style.left = (x + i * 11 - 18) + "px";
     e.style.top = (y - i * 7) + "px";
     document.body.appendChild(e);
-    setTimeout(() => e.remove(), 780);
+    setTimeout(() => e.remove(),780);
   });
-}
-
-function escapeHtml(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
 }
 
 addTop.onclick = () => openEdit(null);
