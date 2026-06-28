@@ -1,5 +1,5 @@
 const C=["#76d9dc","#ff9fb8","#bff0dd","#b9ddff","#d8c8ff","#fff0bd","#ffbe88","#c9e76b"];
-const K="tane_v3_clean";
+const K="tane_v4_magic";
 
 let data=JSON.parse(localStorage[K]||"null")||{
   cats:["やること","行きたい・食べたい","気になる","待ち"],
@@ -56,31 +56,61 @@ function row(item,index){
       </div>
     </div>`;
   const card=r.querySelector(".item");
-  let sx=0,dx=0,moved=false;
+  let sx=0,dx=0,moved=false,finishedPress=false;
 
   card.addEventListener("touchstart",e=>{
-    sx=e.touches[0].clientX;dx=0;moved=false;
+    sx=e.touches[0].clientX;
+    dx=0;
+    moved=false;
+    finishedPress=false;
+
     timer=setTimeout(()=>{
+      finishedPress=true;
       finishTarget=index;
+      card.classList.add("holdDone");
       openFinish();
-      sparkle(innerWidth/2,innerHeight/2);
-    },700);
+    },720);
   },{passive:true});
 
   card.addEventListener("touchmove",e=>{
     dx=e.touches[0].clientX-sx;
-    if(Math.abs(dx)>10){moved=true;clearTimeout(timer)}
-    if(dx>0) card.style.transform=`translate3d(${Math.min(dx,76)}px,0,0)`;
+
+    if(Math.abs(dx)>10){
+      moved=true;
+      clearTimeout(timer);
+      card.classList.remove("holdDone");
+    }
+
+    if(dx>0){
+      card.style.transform=`translate3d(${Math.min(dx,150)}px,0,0)`;
+    }
   },{passive:true});
 
   card.addEventListener("touchend",()=>{
     clearTimeout(timer);
+    card.classList.remove("holdDone");
     card.style.transform="";
-    if(dx>52){target=index;openNext();return}
-    if(!moved) openEdit(index);
+
+    if(finishedPress){
+      return;
+    }
+
+    if(dx>110){
+      target=index;
+      openNext();
+      return;
+    }
+
+    if(!moved){
+      openEdit(index);
+    }
   });
 
-  r.querySelector(".action").onclick=()=>{target=index;openNext()};
+  r.querySelector(".action").onclick=()=>{
+    target=index;
+    openNext();
+  };
+
   return r;
 }
 
@@ -88,6 +118,7 @@ function openEdit(index,cat){
   cur=index;
   const item=index==null?{t:"",c:cat||data.cats[0],n:"",m:"",col:C[0],log:[]}:data.items[index];
   col=item.col||C[0];
+
   const history=item.log?.length?`
     <label>これまで</label>
     <div class="history">${item.log.map(x=>`<div>✓ ${esc(x)}</div>`).join("")}</div>`:"";
@@ -112,7 +143,10 @@ function drawColors(){
     const b=document.createElement("button");
     b.className="sw"+(c===col?" sel":"");
     b.style.background=c;
-    b.onclick=()=>{col=c;drawColors();sparkle(innerWidth/2,innerHeight/2)};
+    b.onclick=()=>{
+      col=c;
+      drawColors();
+    };
     box.appendChild(b);
   });
 }
@@ -129,7 +163,9 @@ function saveEdit(){
     log:cur==null?[]:(data.items[cur].log||[])
   };
   cur==null?data.items.unshift(item):data.items[cur]=item;
-  save();editDialog.close();render();sparkle(innerWidth-45,80);
+  save();
+  editDialog.close();
+  render();
 }
 
 function openNext(){
@@ -144,23 +180,34 @@ function openNext(){
 function saveNext(){
   const item=data.items[target];
   const next=document.getElementById("nextText").value.trim();
-  if(item.n){item.log=item.log||[];item.log.push(item.n)}
+  if(item.n){
+    item.log=item.log||[];
+    item.log.push(item.n);
+  }
   item.n=next;
-  save();nextDialog.close();render();sparkle(innerWidth/2,innerHeight/2);
+  save();
+  nextDialog.close();
+  render();
 }
 
 function openFinish(){
   finishDialog.innerHTML=`
     <h2>✦</h2>
-    <div class="confirmText">ここでおしまいにする？</div>
-    <div class="btns"><button class="btn" onclick="finishDialog.close()">まだ置く</button><button class="btn ok" onclick="finishConfirmed()">おしまい</button></div>`;
+    <div class="btns">
+      <button class="btn" onclick="finishDialog.close()">戻す</button>
+      <button class="btn ok" onclick="finishConfirmed()">しまう</button>
+    </div>`;
   finishDialog.showModal();
 }
 
 function finishConfirmed(){
   const item=data.items.splice(finishTarget,1)[0];
   data.done.unshift({...item,at:new Date().toISOString()});
-  save();finishTarget=null;finishDialog.close();render();sparkle(innerWidth-35,innerHeight-45);
+  save();
+  finishTarget=null;
+  finishDialog.close();
+  render();
+  finishMagic();
 }
 
 function showDone(){
@@ -174,18 +221,26 @@ function showDone(){
   archiveDialog.showModal();
 }
 
-function delDone(i){data.done.splice(i,1);save();showDone()}
+function delDone(i){
+  data.done.splice(i,1);
+  save();
+  showDone();
+}
 
-function sparkle(x,y){
-  ["✦","･","✧","✦"].forEach((s,i)=>{
+function finishMagic(){
+  const endX=innerWidth-38;
+  const endY=innerHeight-46;
+  for(let i=0;i<18;i++){
     const e=document.createElement("div");
-    e.className="spark";
-    e.textContent=s;
-    e.style.left=(x+i*11-18)+"px";
-    e.style.top=(y-i*7)+"px";
+    e.className="finishSpark";
+    e.textContent=["✦","✧","･","✨"][i%4];
+    e.style.left=(innerWidth/2+(Math.random()*90-45))+"px";
+    e.style.top=(innerHeight/2+(Math.random()*50-25))+"px";
+    e.style.setProperty("--tx",(endX-innerWidth/2+(Math.random()*30-15))+"px");
+    e.style.setProperty("--ty",(endY-innerHeight/2+(Math.random()*30-15))+"px");
     document.body.appendChild(e);
-    setTimeout(()=>e.remove(),780);
-  });
+    setTimeout(()=>e.remove(),1000);
+  }
 }
 
 addTop.onclick=()=>openEdit(null);
