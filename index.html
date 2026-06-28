@@ -1,95 +1,63 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>種</title><style>
-:root{--ink:#27222f;--muted:#8a8190;--line:#eee6ee;--bg:#fffafd}
+:root{--ink:#27222f;--muted:#8b8192;--line:#eee7ef;--glass:#fffdfa}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 12% 0%,#8be1e455,transparent 30%),radial-gradient(circle at 92% 2%,#ff9fbd44,transparent 24%),linear-gradient(180deg,#fffaff,#fbfdff)}
-header{position:sticky;top:0;z-index:10;padding:13px 15px 9px;background:#fffafdcc;backdrop-filter:blur(18px);border-bottom:1px solid #eee6ee99}
-.top{display:flex;align-items:center;gap:10px}.mark{width:30px;height:30px;border-radius:13px;background:linear-gradient(135deg,#73d9dc,#ff9fb8 58%,#d8c8ff);box-shadow:0 8px 18px #73d9dc55}
-h1{margin:0;font-size:23px;font-weight:850;flex:1}.plus{width:38px;height:38px;border:0;border-radius:16px;background:#ffffffe8;box-shadow:0 10px 24px #30263a18;font-size:25px;color:#332b3c}
-main{padding:10px 10px 80px;display:flex;flex-direction:column;gap:10px}
-.group{border-radius:24px;background:#ffffffb8;border:1px solid #eee6ee;box-shadow:0 12px 30px #30263a12;overflow:hidden}
-.gh{height:38px;padding:8px 11px;display:flex;align-items:center;border-bottom:1px solid #eee6ee99}.gn{font-size:15px;font-weight:850;flex:1}.gc{font-size:11px;color:var(--muted)}
-.list{padding:6px;display:flex;flex-direction:column;gap:5px}.row{position:relative;border-radius:17px;overflow:hidden;background:#f6f0f7}
-.actions{position:absolute;inset:0;display:flex;justify-content:space-between}.act{width:78px;border:0;color:white;font-size:22px;font-weight:800}.left{background:#78c9b7}.right{background:#f08aa4}
-.item{position:relative;z-index:2;background:#fffefdf0;border:1px solid #eee6ee;border-radius:17px;transition:transform .18s ease;touch-action:pan-y}
-.item.openL{transform:translateX(78px)}.item.openR{transform:translateX(-78px)}
-.item:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c,#73d9dc)}
-.inner{padding:8px 10px 8px 16px}.ttl{font-size:15px;font-weight:850;line-height:1.25}.step{font-size:12.5px;color:#423849;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.memo{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.empty{padding:12px;text-align:center;color:#aaa1ad;font-size:13px}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 0%,#83dde052,transparent 28%),radial-gradient(circle at 92% 2%,#ff9fbb3b,transparent 25%),linear-gradient(180deg,#fffaff,#fbfdff)}
+header{position:sticky;top:0;z-index:10;padding:12px 14px 8px;background:#fffafddd;backdrop-filter:blur(18px);border-bottom:1px solid #eee7ef99}
+.top{display:flex;align-items:center;gap:10px}.mark{width:30px;height:30px;border-radius:13px;background:linear-gradient(135deg,#78dadd,#ff9db7 58%,#d7c8ff);box-shadow:0 8px 18px #78dadd55}h1{margin:0;font-size:23px;font-weight:850;flex:1}.icon{border:0;background:#ffffffe8;border-radius:15px;width:37px;height:37px;font-size:23px;box-shadow:0 10px 24px #30263a18;color:#322b3a}
+main{padding:9px 9px 76px;display:flex;flex-direction:column;gap:9px}
+.group{border:1px solid #eee7ef;border-radius:22px;background:#ffffffb8;box-shadow:0 10px 26px #30263a12;overflow:hidden}
+.gh{height:36px;padding:7px 9px 7px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #eee7ef99}.gn{font-size:15px;font-weight:850;flex:1}.gc{font-size:11px;color:var(--muted)}.miniPlus{border:0;background:#fff;border-radius:12px;width:28px;height:28px;font-size:18px;color:#403849;box-shadow:0 4px 12px #30263a12}
+.list{padding:6px;display:flex;flex-direction:column;gap:5px}
+.row{position:relative;border-radius:16px;overflow:hidden;background:#f6f0f7}.actions{position:absolute;inset:0;display:flex;justify-content:space-between}.act{width:74px;border:0;color:#fff;font-size:24px;font-weight:850}.next{background:#7ac7b6}.done{background:#9a8ce8}
+.item{position:relative;z-index:2;border:1px solid #eee7ef;border-radius:16px;background:#fffefdf2;box-shadow:0 7px 18px #30263a10;transition:transform .18s ease;touch-action:pan-y}.item:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c,#78dadd)}
+.item.openL{transform:translateX(74px)}.item.openR{transform:translateX(-74px)}
+.inner{padding:8px 9px 8px 16px}.ttl{font-size:15px;font-weight:850;line-height:1.25}.now{font-size:12.8px;font-weight:760;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.memo{font-size:10.8px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.log{font-size:10.5px;color:#9a91a0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{padding:9px;text-align:center;color:#b0a8b3;font-size:12px}
 dialog{border:0;border-radius:26px;width:calc(100% - 30px);max-width:520px;padding:18px;box-shadow:0 24px 70px #0004;background:white}
 dialog::backdrop{background:#2a203055}h2{font-size:18px;margin:0 0 14px}
-input,textarea,select{width:100%;border:1px solid var(--line);border-radius:17px;padding:12px;margin:6px 0 11px;font-size:16px;background:#fffdfd;color:var(--ink)}
-label{font-size:12px;color:var(--muted);font-weight:800}.colors{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}.sw{width:34px;height:34px;border:2px solid white;border-radius:13px;box-shadow:0 0 0 1px var(--line)}.sel{box-shadow:0 0 0 3px #302938}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:1px solid var(--line);background:white;border-radius:999px;padding:12px;font-weight:800}.ok{background:linear-gradient(135deg,#302938,#6d5983);color:white;border:0}.danger{margin-top:14px;border:0;background:transparent;color:#d2627b;font-weight:850;padding:10px}
+label{font-size:12px;color:var(--muted);font-weight:850}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px;margin:6px 0 11px;font-size:16px;background:#fffdfd;color:var(--ink)}
+.colors{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}.sw{width:34px;height:34px;border:2px solid white;border-radius:13px;box-shadow:0 0 0 1px var(--line)}.sel{box-shadow:0 0 0 3px #302938}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:1px solid var(--line);background:white;border-radius:999px;padding:12px;font-weight:850;color:#403849}.ok{background:linear-gradient(135deg,#302938,#6d5983);color:white;border:0}.solo{grid-template-columns:1fr}
 </style></head><body>
-<header><div class="top"><div class="mark"></div><h1>種</h1><button class="plus" onclick="openEdit()">＋</button></div></header>
+<header><div class="top"><div class="mark"></div><h1>種</h1><button class="icon" onclick="openEdit(null)">＋</button><button class="icon" onclick="showDone()">⌂</button></div></header>
 <main id="app"></main>
 
-<dialog id="editDlg"><h2 id="editTitle">＋</h2>
+<dialog id="editDlg"><h2 id="editHead">＋</h2>
 <label>タイトル</label><input id="title">
 <label>カテゴリ</label><select id="cat"></select>
-<label>いま見えること</label><textarea id="step" rows="2"></textarea>
+<label>今できること</label><textarea id="now" rows="2"></textarea>
 <label>メモ</label><textarea id="memo" rows="2"></textarea>
 <label>色</label><div class="colors" id="colors"></div>
-<div class="btns"><button class="btn" onclick="editDlg.close()">閉じる</button><button class="btn ok" onclick="saveItem()">保存</button></div>
-<button id="deleteBtn" class="danger" onclick="removeCurrent()">手放す</button>
+<div class="btns"><button class="btn" onclick="editDlg.close()">閉じる</button><button class="btn ok" onclick="saveEdit()">保存</button></div>
 </dialog>
 
 <dialog id="nextDlg"><h2>↗︎</h2>
-<label>ここまで</label><textarea id="note" rows="2"></textarea>
-<label>つぎ</label><textarea id="next" rows="2"></textarea>
-<div class="btns"><button class="btn" onclick="finishCurrent()">✓</button><button class="btn ok" onclick="saveNext()">↗︎</button></div>
+<label>できたこと</label><textarea id="note" rows="2"></textarea>
+<label>次できること</label><textarea id="nextText" rows="2"></textarea>
+<div class="btns"><button class="btn" onclick="nextDlg.close()">閉じる</button><button class="btn ok" onclick="saveNext()">↗︎</button></div>
 </dialog>
+
+<dialog id="doneDlg"><h2>✓</h2><div id="doneList"></div><div class="btns solo"><button class="btn ok" onclick="doneDlg.close()">閉じる</button></div></dialog>
 
 <script>
 const C=["#76d9dc","#ff9fb8","#bff0dd","#b9ddff","#d8c8ff","#fff0bd","#ffbe88","#c9e76b"];
-const K="tane_quiet_magic_v03";
-let data=JSON.parse(localStorage[K]||"null")||{
-cats:["やること","行きたい・食べたい","気になる","待ち"],
-done:[],
-items:[
-{t:"ふるさと納税する",c:"やること",s:"上限金額を確認する",m:"今年こそ早めに",col:C[0],log:[]},
-{t:"図鑑",c:"気になる",s:"本屋で見てみる",m:"友達おすすめ",col:C[3],log:[]},
-{t:"金沢の水ようかん",c:"行きたい・食べたい",s:"お店の名前を見る",m:"テレビで見た",col:C[1],log:[]},
-{t:"机の書類",c:"やること",s:"必要かだけ見る",m:"しまうと忘れそう",col:C[5],log:[]}
+const K="tane_v04_quiet_magic";
+let data=JSON.parse(localStorage[K]||"null")||{cats:["やること","行きたい・食べたい","気になる","待ち"],done:[],items:[
+{t:"ふるさと納税する",c:"やること",n:"上限金額を確認する",m:"今年こそ早めに",col:C[0],log:[]},
+{t:"図鑑",c:"気になる",n:"本屋で見てみる",m:"友達おすすめ",col:C[3],log:[]},
+{t:"金沢の水ようかん",c:"行きたい・食べたい",n:"お店の名前を見る",m:"テレビで見た",col:C[1],log:[]},
+{t:"机の書類",c:"やること",n:"必要かだけ見る",m:"しまうと忘れそう",col:C[5],log:[]}
 ]};
-let cur=null,col=C[0],target=null;
+let cur=null,target=null,col=C[0],addCat=null;
 function save(){localStorage[K]=JSON.stringify(data)}
-function render(){
-app.innerHTML="";
-data.cats.forEach(c=>{
-let items=data.items.filter(x=>x.c===c),g=document.createElement("section");g.className="group";
-g.innerHTML=`<div class=gh><div class=gn>${c}</div><div class=gc>${items.length}</div></div><div class=list></div>`;
-let list=g.querySelector(".list");
-if(!items.length)list.innerHTML="<div class=empty> </div>";
-items.forEach((x,i)=>list.appendChild(row(x,data.items.indexOf(x))));
-app.appendChild(g);
-});
-}
-function row(x,i){
-let r=document.createElement("div");r.className="row";
-r.innerHTML=`<div class=actions><button class="act left">↗︎</button><button class="act right">×</button></div><div class=item style="--c:${x.col}"><div class=inner><div class=ttl>${x.t}</div><div class=step>${x.s||""}</div><div class=memo>${x.m||""}</div></div></div>`;
-let it=r.querySelector(".item"),sx=0,dx=0,open="";
-it.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;dx=0},{passive:true});
-it.addEventListener("touchmove",e=>{dx=e.touches[0].clientX-sx;if(dx>0)it.style.transform=`translateX(${Math.min(dx,78)}px)`;if(dx<0)it.style.transform=`translateX(${Math.max(dx,-78)}px)`},{passive:true});
-it.addEventListener("touchend",()=>{it.classList.remove("openL","openR");it.style.transform="";if(dx>45){it.classList.add("openL");open="L"}else if(dx<-45){it.classList.add("openR");open="R"}});
-it.onclick=()=>{if(open){it.classList.remove("openL","openR");open=""}else openEdit(i)};
-r.querySelector(".left").onclick=()=>openNext(i);
-r.querySelector(".right").onclick=()=>{data.items.splice(i,1);save();render()};
-return r;
-}
-function openEdit(i){
-cur=i??null;let x=cur==null?{t:"",c:data.cats[0],s:"",m:"",col:C[0],log:[]}:data.items[cur];
-editTitle.textContent=cur==null?"＋":"…";title.value=x.t;step.value=x.s;memo.value=x.m;col=x.col;cat.innerHTML=data.cats.map(c=>`<option ${c==x.c?"selected":""}>${c}</option>`).join("");drawColors();deleteBtn.style.display=cur==null?"none":"block";editDlg.showModal();
-}
+function render(){app.innerHTML="";data.cats.forEach(c=>{let its=data.items.filter(x=>x.c===c),g=document.createElement("section");g.className="group";g.innerHTML=`<div class=gh><div class=gn>${c}</div><div class=gc>${its.length}</div><button class=miniPlus>＋</button></div><div class=list></div>`;g.querySelector(".miniPlus").onclick=()=>openEdit(null,c);let list=g.querySelector(".list");if(!its.length)list.innerHTML="<div class=empty></div>";its.forEach(x=>list.appendChild(row(x,data.items.indexOf(x))));app.appendChild(g)})}
+function row(x,i){let r=document.createElement("div");r.className="row";r.innerHTML=`<div class=actions><button class="act next">↗︎</button><button class="act done">✓</button></div><div class=item style="--c:${x.col}"><div class=inner><div class=ttl>${x.t}</div><div class=now>${x.n||""}</div><div class=memo>${x.m||""}</div><div class=log>${(x.log||[]).slice(-2).map(a=>"✓ "+a).join("　")}</div></div></div>`;let it=r.querySelector(".item"),sx=0,dx=0,open="";it.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;dx=0},{passive:true});it.addEventListener("touchmove",e=>{dx=e.touches[0].clientX-sx;if(dx>0)it.style.transform=`translateX(${Math.min(dx,74)}px)`;if(dx<0)it.style.transform=`translateX(${Math.max(dx,-74)}px)`},{passive:true});it.addEventListener("touchend",()=>{it.classList.remove("openL","openR");it.style.transform="";if(dx>45){it.classList.add("openL");open="L"}else if(dx<-45){it.classList.add("openR");open="R"}});it.onclick=()=>{if(open){it.classList.remove("openL","openR");open=""}else openEdit(i)};r.querySelector(".next").onclick=()=>openNext(i);r.querySelector(".done").onclick=()=>finish(i);return r}
+function openEdit(i,c){cur=i;addCat=c||null;let x=i==null?{t:"",c:addCat||data.cats[0],n:"",m:"",col:C[0],log:[]}:data.items[i];editHead.textContent=i==null?"＋":"…";title.value=x.t;now.value=x.n;memo.value=x.m;col=x.col;cat.innerHTML=data.cats.map(k=>`<option ${k==x.c?"selected":""}>${k}</option>`).join("");drawColors();editDlg.showModal()}
 function drawColors(){colors.innerHTML="";C.forEach(c=>{let b=document.createElement("button");b.className="sw"+(c==col?" sel":"");b.style.background=c;b.onclick=()=>{col=c;drawColors()};colors.appendChild(b)})}
-function saveItem(){
-let x={t:title.value,c:cat.value,s:step.value,m:memo.value,col,log:cur==null?[]:data.items[cur].log};
-if(!x.t)return;
-cur==null?data.items.unshift(x):data.items[cur]=x;save();editDlg.close();render();
-}
-function removeCurrent(){if(cur!=null){data.items.splice(cur,1);save();editDlg.close();render()}}
-function openNext(i){target=i;note.value="";next.value="";nextDlg.showModal()}
-function saveNext(){let x=data.items[target];x.log=x.log||[];x.log.push({s:x.s,n:note.value});x.s=next.value;save();nextDlg.close();render()}
-function finishCurrent(){let x=data.items.splice(target,1)[0];data.done.unshift(x);save();nextDlg.close();render()}
+function saveEdit(){let x={t:title.value.trim(),c:cat.value,n:now.value.trim(),m:memo.value.trim(),col,log:cur==null?[]:data.items[cur].log};if(!x.t)return;cur==null?data.items.unshift(x):data.items[cur]=x;save();editDlg.close();render()}
+function openNext(i){target=i;note.value=data.items[i].n||"";nextText.value="";nextDlg.showModal()}
+function saveNext(){let x=data.items[target];if(note.value.trim())x.log.push(note.value.trim());x.n=nextText.value.trim();save();nextDlg.close();render()}
+function finish(i){let x=data.items.splice(i,1)[0];data.done.unshift({...x,at:new Date().toISOString()});save();render()}
+function showDone(){doneList.innerHTML=data.done.length?data.done.map(x=>`<div class="item" style="margin:8px 0;--c:${x.col}"><div class=inner><div class=ttl>${x.t}</div><div class=memo>${x.n||""}</div></div></div>`).join(""):"<div class=empty> </div>";doneDlg.showModal()}
 render();
 </script></body></html>
