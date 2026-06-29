@@ -1,47 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>種</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fbf8ff">
+  <title>種</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header>
+    <div class="logo" aria-hidden="true"></div>
+    <h1>種</h1>
+    <button id="addTop" aria-label="追加">＋</button>
+  </header>
 
-<header>
+  <main id="app"></main>
 
-<div class="logo"></div>
+  <button id="archiveBtn" aria-label="保管庫">□</button>
 
-<h1>種</h1>
+  <dialog id="editDialog"></dialog>
+  <dialog id="nextDialog"></dialog>
+  <dialog id="finishDialog"></dialog>
+  <dialog id="archiveDialog"></dialog>
 
-<button id="addTop">＋</button>
-
-</header>
-
-<main id="app"></main>
-
-<button id="archiveBtn">□</button>
-
-<!-- 編集 -->
-
-<dialog id="editDialog"></dialog>
-
-<!-- 次へ -->
-
-<dialog id="nextDialog"></dialog>
-
-<!-- 完了 -->
-
-<dialog id="finishDialog"></dialog>
-
-<!-- 保管庫 -->
-
-<dialog id="archiveDialog"></dialog>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>

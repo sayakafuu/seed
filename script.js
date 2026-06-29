@@ -1,248 +1,363 @@
-const C=["#76d9dc","#ff9fb8","#bff0dd","#b9ddff","#d8c8ff","#fff0bd","#ffbe88","#c9e76b"];
-const K="tane_v4_magic";
+const COLORS = ["#7EDBD9","#FFA6C5","#BCEED8","#BFD8FF","#D8CBFF","#FFF2B8","#FFC48D","#CAE96B"];
+const STORAGE_KEY = "tane_v6_plan_queue";
 
-let data=JSON.parse(localStorage[K]||"null")||{
-  cats:["やること","行きたい・食べたい","気になる","待ち"],
-  done:[],
-  items:[
-    {t:"ふるさと納税する",c:"やること",n:"上限金額を確認する",m:"今年こそ早めに",col:C[0],log:[]},
-    {t:"金沢の水ようかん",c:"行きたい・食べたい",n:"お店の名前を見る",m:"テレビで見た",col:C[1],log:[]},
-    {t:"図鑑",c:"気になる",n:"本屋で見てみる",m:"友達おすすめ",col:C[3],log:[]}
+const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || {
+  categories:["やること","行きたい・食べたい","気になる","待ち"],
+  archive:[],
+  cards:[
+    {title:"ふるさと納税",category:"やること",current:"上限額を調べる",memo:"",history:[],queue:["返礼品を選ぶ","寄付する","ワンストップ申請をする"],color:COLORS[0]},
+    {title:"台湾旅行",category:"行きたい・食べたい",current:"行き先を決める",memo:"",history:[],queue:["宿を決める","宿を予約する","行くところを決める","予定を組む"],color:COLORS[3]},
+    {title:"図鑑",category:"気になる",current:"本屋で見てみる",memo:"友達おすすめ",history:[],queue:[],color:COLORS[5]}
   ]
 };
 
-let cur=null,target=null,finishTarget=null,col=C[0],timer=null;
-const app=document.getElementById("app");
-const addTop=document.getElementById("addTop");
-const archiveBtn=document.getElementById("archiveBtn");
-const editDialog=document.getElementById("editDialog");
-const nextDialog=document.getElementById("nextDialog");
-const finishDialog=document.getElementById("finishDialog");
-const archiveDialog=document.getElementById("archiveDialog");
+const app = document.getElementById("app");
+const addTop = document.getElementById("addTop");
+const archiveBtn = document.getElementById("archiveBtn");
+const editDialog = document.getElementById("editDialog");
+const nextDialog = document.getElementById("nextDialog");
+const finishDialog = document.getElementById("finishDialog");
+const archiveDialog = document.getElementById("archiveDialog");
 
-function save(){localStorage[K]=JSON.stringify(data)}
-function esc(s){return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+let editIndex = null;
+let nextIndex = null;
+let finishIndex = null;
+let selectedColor = COLORS[0];
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function h(str){
+  return String(str || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+function normalizeCard(card){
+  if(!card.history) card.history = [];
+  if(!card.queue) card.queue = [];
+  if(!card.color) card.color = COLORS[0];
+  return card;
+}
 
 function render(){
-  app.innerHTML="";
-  data.cats.forEach(cat=>{
-    const items=data.items.filter(x=>x.c===cat);
-    const group=document.createElement("section");
-    group.className="group";
-    group.innerHTML=`
+  app.innerHTML = "";
+
+  state.cards.forEach(normalizeCard);
+
+  state.categories.forEach(category => {
+    const cards = state.cards.filter(card => card.category === category);
+
+    const section = document.createElement("section");
+    section.className = "group";
+    section.innerHTML = `
       <div class="groupHead">
-        <div class="groupName">${esc(cat)}</div>
-        <div class="groupCount">${items.length}</div>
-        <button class="miniPlus">＋</button>
+        <div class="groupName">${h(category)}</div>
+        <div class="groupCount">${cards.length}</div>
+        <button class="miniPlus" aria-label="追加">＋</button>
       </div>
-      <div class="list"></div>`;
-    group.querySelector(".miniPlus").onclick=()=>openEdit(null,cat);
-    const list=group.querySelector(".list");
-    items.forEach(item=>list.appendChild(row(item,data.items.indexOf(item))));
-    app.appendChild(group);
+      <div class="list"></div>
+    `;
+
+    section.querySelector(".miniPlus").onclick = () => openEdit(null, category);
+
+    const list = section.querySelector(".list");
+    cards.forEach(card => list.appendChild(createCard(card, state.cards.indexOf(card))));
+    app.appendChild(section);
   });
 }
 
-function row(item,index){
-  const r=document.createElement("div");
-  r.className="row";
-  r.innerHTML=`
-    <button class="action">✨</button>
-    <div class="item" style="--c:${item.col}">
+function createCard(card, index){
+  normalizeCard(card);
+
+  const row = document.createElement("div");
+  row.className = "row";
+  const queueText = card.queue.length ? `このあと ${card.queue.length}件：${h(card.queue[0])}` : "";
+
+  row.innerHTML = `
+    <button class="action" aria-label="次へ">✨</button>
+    <div class="item" style="--lineColor:${card.color}">
       <div class="inner">
-        <div class="title">${esc(item.t)}</div>
-        <div class="now">${esc(item.n)}</div>
-        <div class="memo">${esc(item.m)}</div>
+        <div class="title">${h(card.title)}</div>
+        <div class="now">${h(card.current)}</div>
+        ${card.memo ? `<div class="memo">${h(card.memo)}</div>` : ""}
+        ${queueText ? `<div class="queueMini">${queueText}</div>` : ""}
       </div>
-    </div>`;
-  const card=r.querySelector(".item");
-  let sx=0,dx=0,moved=false,finishedPress=false;
+    </div>
+  `;
 
-  card.addEventListener("touchstart",e=>{
-    sx=e.touches[0].clientX;
-    dx=0;
-    moved=false;
-    finishedPress=false;
+  const item = row.querySelector(".item");
+  const action = row.querySelector(".action");
 
-    timer=setTimeout(()=>{
-      finishedPress=true;
-      finishTarget=index;
-      card.classList.add("holdDone");
+  let startX = 0, dx = 0, moved = false, longPressed = false, timer = null;
+
+  item.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+    dx = 0; moved = false; longPressed = false;
+
+    timer = setTimeout(() => {
+      longPressed = true;
+      finishIndex = index;
+      item.classList.add("hold");
+      navigator.vibrate?.(12);
       openFinish();
-    },720);
-  },{passive:true});
+    }, 720);
+  }, {passive:true});
 
-  card.addEventListener("touchmove",e=>{
-    dx=e.touches[0].clientX-sx;
+  item.addEventListener("touchmove", e => {
+    dx = e.touches[0].clientX - startX;
 
-    if(Math.abs(dx)>10){
-      moved=true;
+    if(Math.abs(dx) > 8){
+      moved = true;
       clearTimeout(timer);
-      card.classList.remove("holdDone");
+      item.classList.remove("hold");
     }
 
-    if(dx>0){
-      card.style.transform=`translate3d(${Math.min(dx,150)}px,0,0)`;
+    if(dx > 0){
+      row.classList.add("dragging");
+      item.style.transform = `translate3d(${Math.max(0, dx)}px,0,0)`;
     }
-  },{passive:true});
+  }, {passive:true});
 
-  card.addEventListener("touchend",()=>{
+  item.addEventListener("touchend", () => {
     clearTimeout(timer);
-    card.classList.remove("holdDone");
-    card.style.transform="";
+    item.classList.remove("hold");
+    row.classList.remove("dragging");
+    item.style.transform = "";
 
-    if(finishedPress){
+    if(longPressed) return;
+
+    if(dx > window.innerWidth * 0.28){
+      nextIndex = index;
+      advanceOrAsk();
       return;
     }
 
-    if(dx>110){
-      target=index;
-      openNext();
-      return;
-    }
-
-    if(!moved){
-      openEdit(index);
-    }
+    if(!moved) openEdit(index);
   });
 
-  r.querySelector(".action").onclick=()=>{
-    target=index;
-    openNext();
+  action.onclick = () => {
+    nextIndex = index;
+    advanceOrAsk();
   };
 
-  return r;
+  return row;
 }
 
-function openEdit(index,cat){
-  cur=index;
-  const item=index==null?{t:"",c:cat||data.cats[0],n:"",m:"",col:C[0],log:[]}:data.items[index];
-  col=item.col||C[0];
+function openEdit(index, category){
+  editIndex = index;
 
-  const history=item.log?.length?`
-    <label>これまで</label>
-    <div class="history">${item.log.map(x=>`<div>✓ ${esc(x)}</div>`).join("")}</div>`:"";
+  const card = index === null
+    ? {title:"", category:category || state.categories[0], current:"", memo:"", history:[], queue:[], color:COLORS[0]}
+    : normalizeCard(state.cards[index]);
 
-  editDialog.innerHTML=`
-    <h2>${index==null?"＋":"…"}</h2>
-    <label>タイトル</label><input id="editTitle" value="${esc(item.t)}">
-    <label>カテゴリ</label><select id="editCat">${data.cats.map(c=>`<option ${c===item.c?"selected":""}>${esc(c)}</option>`).join("")}</select>
-    <label>今できること</label><textarea id="editNow" rows="2">${esc(item.n)}</textarea>
-    ${history}
-    <label>メモ</label><textarea id="editMemo" rows="2">${esc(item.m)}</textarea>
-    <label>色</label><div class="colors" id="colorBox"></div>
-    <div class="btns"><button class="btn" onclick="editDialog.close()">閉じる</button><button class="btn ok" onclick="saveEdit()">保存</button></div>`;
+  selectedColor = card.color || COLORS[0];
+
+  const historyHtml = card.history.length
+    ? `<label>これまで</label><div class="history">${card.history.map(x => `<div>✓ ${h(x)}</div>`).join("")}</div>`
+    : "";
+
+  const queueHtml = card.queue.length
+    ? `<label>このあと</label><div class="queueView">${card.queue.map(x => `<div>${h(x)}</div>`).join("")}</div>`
+    : "";
+
+  editDialog.innerHTML = `
+    <h2>${index === null ? "＋" : "…"}</h2>
+
+    <label>タイトル</label>
+    <input id="title" value="${h(card.title)}">
+
+    <label>カテゴリ</label>
+    <select id="category">
+      ${state.categories.map(c => `<option ${c === card.category ? "selected" : ""}>${h(c)}</option>`).join("")}
+    </select>
+
+    <label>今できること</label>
+    <textarea id="current">${h(card.current)}</textarea>
+
+    <label>このあと</label>
+    <textarea id="queue" class="queue" placeholder="1行ずつ書く">${h(card.queue.join("\\n"))}</textarea>
+
+    ${historyHtml}
+
+    <label>メモ</label>
+    <textarea id="memo">${h(card.memo)}</textarea>
+
+    <label>色</label>
+    <div id="colors" class="colors"></div>
+
+    <div class="btns">
+      <button class="btn" onclick="editDialog.close()">閉じる</button>
+      <button class="btn ok" onclick="saveEdit()">保存</button>
+    </div>
+  `;
+
   drawColors();
   editDialog.showModal();
 }
 
 function drawColors(){
-  const box=document.getElementById("colorBox");
-  box.innerHTML="";
-  C.forEach(c=>{
-    const b=document.createElement("button");
-    b.className="sw"+(c===col?" sel":"");
-    b.style.background=c;
-    b.onclick=()=>{
-      col=c;
+  const box = document.getElementById("colors");
+  box.innerHTML = "";
+
+  COLORS.forEach(color => {
+    const button = document.createElement("button");
+    button.className = "sw" + (color === selectedColor ? " sel" : "");
+    button.style.background = color;
+    button.onclick = () => {
+      selectedColor = color;
       drawColors();
+      navigator.vibrate?.(6);
     };
-    box.appendChild(b);
+    box.appendChild(button);
   });
 }
 
+function linesFromTextarea(id){
+  return document.getElementById(id).value
+    .split(/\n/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
 function saveEdit(){
-  const title=document.getElementById("editTitle").value.trim();
-  if(!title)return;
-  const item={
-    t:title,
-    c:document.getElementById("editCat").value,
-    n:document.getElementById("editNow").value.trim(),
-    m:document.getElementById("editMemo").value.trim(),
-    col,
-    log:cur==null?[]:(data.items[cur].log||[])
+  const title = document.getElementById("title").value.trim();
+  if(!title) return;
+
+  const card = {
+    title,
+    category:document.getElementById("category").value,
+    current:document.getElementById("current").value.trim(),
+    memo:document.getElementById("memo").value.trim(),
+    history:editIndex === null ? [] : (state.cards[editIndex].history || []),
+    queue:linesFromTextarea("queue"),
+    color:selectedColor
   };
-  cur==null?data.items.unshift(item):data.items[cur]=item;
+
+  if(editIndex === null) state.cards.unshift(card);
+  else state.cards[editIndex] = card;
+
   save();
   editDialog.close();
   render();
 }
 
+function advanceOrAsk(){
+  const card = normalizeCard(state.cards[nextIndex]);
+
+  if(card.current) card.history.push(card.current);
+
+  if(card.queue.length){
+    card.current = card.queue.shift();
+    save();
+    render();
+    return;
+  }
+
+  openNext();
+}
+
 function openNext(){
-  nextDialog.innerHTML=`
+  nextDialog.innerHTML = `
     <h2>✨</h2>
     <label>次できること</label>
-    <textarea id="nextText" rows="3" autofocus></textarea>
-    <div class="btns"><button class="btn" onclick="nextDialog.close()">閉じる</button><button class="btn ok" onclick="saveNext()">↗︎</button></div>`;
+    <textarea id="nextInput" autofocus></textarea>
+    <div class="btns">
+      <button class="btn" onclick="nextDialog.close()">閉じる</button>
+      <button class="btn ok" onclick="saveNext()">進める</button>
+    </div>
+  `;
+
   nextDialog.showModal();
 }
 
 function saveNext(){
-  const item=data.items[target];
-  const next=document.getElementById("nextText").value.trim();
-  if(item.n){
-    item.log=item.log||[];
-    item.log.push(item.n);
-  }
-  item.n=next;
+  const next = document.getElementById("nextInput").value.trim();
+  const card = normalizeCard(state.cards[nextIndex]);
+
+  card.current = next;
   save();
   nextDialog.close();
   render();
 }
 
 function openFinish(){
-  finishDialog.innerHTML=`
+  finishDialog.innerHTML = `
     <h2>✦</h2>
     <div class="btns">
       <button class="btn" onclick="finishDialog.close()">戻す</button>
-      <button class="btn ok" onclick="finishConfirmed()">しまう</button>
-    </div>`;
+      <button class="btn ok" onclick="finishCard()">しまう</button>
+    </div>
+  `;
   finishDialog.showModal();
 }
 
-function finishConfirmed(){
-  const item=data.items.splice(finishTarget,1)[0];
-  data.done.unshift({...item,at:new Date().toISOString()});
+function finishCard(){
+  const card = state.cards.splice(finishIndex, 1)[0];
+  state.archive.unshift({...card, archivedAt:new Date().toISOString()});
   save();
-  finishTarget=null;
   finishDialog.close();
   render();
-  finishMagic();
+  magic();
 }
 
-function showDone(){
-  archiveDialog.innerHTML=`
+function showArchive(){
+  archiveDialog.innerHTML = `
     <h2>□</h2>
     <div id="archiveList"></div>
-    <div class="btns solo"><button class="btn ok" onclick="archiveDialog.close()">閉じる</button></div>`;
-  const list=archiveDialog.querySelector("#archiveList");
-  list.innerHTML=data.done.length?data.done.map((x,i)=>`
-    <div class="oldRow"><span class="oldTitle">${esc(x.t)}</span><button class="oldDel" onclick="delDone(${i})">×</button></div>`).join(""):`<div class="memo"></div>`;
+    <div class="btns">
+      <button class="btn ok" onclick="archiveDialog.close()">閉じる</button>
+    </div>
+  `;
+
+  const list = archiveDialog.querySelector("#archiveList");
+
+  if(!state.archive.length){
+    list.innerHTML = `<div class="memo">まだありません</div>`;
+  }else{
+    state.archive.forEach((card, index) => {
+      const row = document.createElement("div");
+      row.className = "oldRow";
+      row.innerHTML = `<span class="oldTitle">${h(card.title)}</span><button class="oldDel">×</button>`;
+      row.querySelector(".oldDel").onclick = () => {
+        state.archive.splice(index, 1);
+        save();
+        showArchive();
+      };
+      list.appendChild(row);
+    });
+  }
+
   archiveDialog.showModal();
 }
 
-function delDone(i){
-  data.done.splice(i,1);
-  save();
-  showDone();
-}
+function magic(){
+  const fromX = window.innerWidth / 2;
+  const fromY = window.innerHeight / 2;
+  const toX = window.innerWidth - 38;
+  const toY = window.innerHeight - 42;
 
-function finishMagic(){
-  const endX=innerWidth-38;
-  const endY=innerHeight-46;
-  for(let i=0;i<18;i++){
-    const e=document.createElement("div");
-    e.className="finishSpark";
-    e.textContent=["✦","✧","･","✨"][i%4];
-    e.style.left=(innerWidth/2+(Math.random()*90-45))+"px";
-    e.style.top=(innerHeight/2+(Math.random()*50-25))+"px";
-    e.style.setProperty("--tx",(endX-innerWidth/2+(Math.random()*30-15))+"px");
-    e.style.setProperty("--ty",(endY-innerHeight/2+(Math.random()*30-15))+"px");
-    document.body.appendChild(e);
-    setTimeout(()=>e.remove(),1000);
+  for(let i = 0; i < 34; i++){
+    const p = document.createElement("div");
+    p.className = "finishSpark" + (i % 5 === 0 ? " star" : "");
+    if(i % 5 === 0) p.textContent = "✦";
+
+    const spreadX = Math.random() * 120 - 60;
+    const spreadY = Math.random() * 70 - 35;
+    const startX = fromX + spreadX;
+    const startY = fromY + spreadY;
+
+    p.style.left = startX + "px";
+    p.style.top = startY + "px";
+    p.style.setProperty("--tx", (toX - startX + Math.random() * 34 - 17) + "px");
+    p.style.setProperty("--ty", (toY - startY + Math.random() * 34 - 17) + "px");
+
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
   }
 }
 
-addTop.onclick=()=>openEdit(null);
-archiveBtn.onclick=showDone;
+addTop.onclick = () => openEdit(null);
+archiveBtn.onclick = showArchive;
 render();
