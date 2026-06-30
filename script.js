@@ -22,7 +22,6 @@ const archiveDialog = document.getElementById("archiveDialog");
 let editIndex = null;
 let nextIndex = null;
 let finishIndex = null;
-let finishElement = null;
 let selectedColor = COLORS[0];
 
 function save() {
@@ -102,13 +101,12 @@ function createCard(card, index) {
     timer = setTimeout(() => {
       longPressed = true;
       finishIndex = index;
-      finishElement = item;
       item.classList.remove("pressing");
       item.classList.add("holdReady");
       vibrate([8, 34, 12]);
       setTimeout(() => item.classList.remove("holdReady"), 260);
       openFinish();
-    }, 820);
+    }, 760);
   }, { passive: true });
 
   item.addEventListener("touchmove", e => {
@@ -238,27 +236,18 @@ function openNext() {
   const card = normalizeCard(state.cards[nextIndex]);
   const proposed = card.queue.length ? card.queue[0] : "";
   nextDialog.innerHTML = `
-    <form method="dialog" class="dialogForm nextForm softPanel">
+    <form method="dialog" class="dialogForm nextForm">
       <h2>次にやること</h2>
       <textarea id="nextInput" placeholder="次にやることを入力">${h(proposed)}</textarea>
       <div class="btns">
-        <button class="btn" type="button" onclick="closeSoft(nextDialog)">キャンセル</button>
+        <button class="btn" type="button" onclick="nextDialog.close()">キャンセル</button>
         <button class="btn ok" type="button" onclick="saveNext()">OK</button>
       </div>
     </form>
   `;
-  nextDialog.classList.add("softOpen");
   nextDialog.showModal();
   // この画面も、開いた直後はキーボードを出さない。
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-}
-
-function closeSoft(dialog) {
-  dialog.classList.add("softClose");
-  setTimeout(() => {
-    dialog.close();
-    dialog.classList.remove("softOpen", "softClose");
-  }, 150);
 }
 
 function saveNext() {
@@ -269,41 +258,41 @@ function saveNext() {
   card.current = next;
   save();
   nextDialog.close();
-  nextDialog.classList.remove("softOpen", "softClose");
   render();
 }
 
 function openFinish() {
   finishDialog.innerHTML = `
-    <form method="dialog" class="finishBox softPanel">
-      <button class="finishChoice finishKeep" type="button" onclick="finishCard()">
-        <span class="boxIcon" aria-hidden="true"></span><span>しまう</span>
-      </button>
-      <button class="finishChoice finishBack" type="button" onclick="closeSoft(finishDialog)">
-        <span class="backIcon" aria-hidden="true">↺</span><span>戻す</span>
-      </button>
+    <form method="dialog" class="finishBox">
+      <button class="finishBtn finishStore" type="button" onclick="finishCard()"><span class="treasureIcon" aria-hidden="true"></span><span>しまう</span></button>
+      <button class="finishBtn finishBack" type="button" onclick="finishDialog.close()"><span class="backIcon" aria-hidden="true">↺</span><span>戻す</span></button>
     </form>
   `;
-  finishDialog.classList.add("softOpen", "finishDialog");
   finishDialog.showModal();
 }
 
 function finishCard() {
-  const startRect = finishElement ? finishElement.getBoundingClientRect() : null;
-  const card = state.cards.splice(finishIndex, 1)[0];
+  const card = state.cards[finishIndex];
+  const start = getCardCenter(finishIndex);
+  state.cards.splice(finishIndex, 1);
   state.archive.unshift({ ...card, archivedAt: new Date().toISOString() });
   save();
   finishDialog.close();
-  finishDialog.classList.remove("softOpen", "softClose", "finishDialog");
-  flyToArchive(card, startRect);
-  finishElement = null;
-  setTimeout(render, 180);
+  render();
+  magic(start);
+}
+
+function getCardCenter(index) {
+  const item = [...document.querySelectorAll(".item")][index];
+  if (!item) return { x: window.innerWidth * 0.5, y: window.innerHeight * 0.45 };
+  const r = item.getBoundingClientRect();
+  return { x: r.left + r.width * 0.52, y: r.top + r.height * 0.55 };
 }
 
 function showArchive() {
   archiveDialog.innerHTML = `
     <form method="dialog" class="dialogForm">
-      <h2 class="archiveTitle"><span class="boxIcon" aria-hidden="true"></span></h2>
+      <h2 class="archiveTitle"><span class="treasureIcon" aria-hidden="true"></span></h2>
       <div id="archiveList"></div>
       <div class="btns"><button class="btn" type="button" onclick="archiveDialog.close()">閉じる</button></div>
     </form>
@@ -327,43 +316,30 @@ function showArchive() {
   archiveDialog.showModal();
 }
 
-function flyToArchive(card, startRect) {
-  const targetRect = archiveBtn.getBoundingClientRect();
-  const toX = targetRect.left + targetRect.width / 2;
-  const toY = targetRect.top + targetRect.height / 2;
-  const fromX = startRect ? startRect.left + startRect.width * 0.55 : window.innerWidth * 0.56;
-  const fromY = startRect ? startRect.top + startRect.height * 0.55 : window.innerHeight * 0.58;
+function magic(start = { x: window.innerWidth * 0.5, y: window.innerHeight * 0.45 }) {
+  const target = archiveBtn.getBoundingClientRect();
+  const toX = target.left + target.width / 2;
+  const toY = target.top + target.height / 2;
 
-  if (startRect && card) {
-    const ghost = document.createElement("div");
-    ghost.className = "archiveGhost";
-    ghost.style.left = `${startRect.left}px`;
-    ghost.style.top = `${startRect.top}px`;
-    ghost.style.width = `${startRect.width}px`;
-    ghost.style.height = `${startRect.height}px`;
-    ghost.style.setProperty("--tx", `${toX - fromX}px`);
-    ghost.style.setProperty("--ty", `${toY - fromY}px`);
-    ghost.style.setProperty("--lineColor", card.color || COLORS[0]);
-    ghost.innerHTML = `<div class="ghostInner"><div>${h(card.title)}</div><span>${h(card.current)}</span></div>`;
-    document.body.appendChild(ghost);
-    setTimeout(() => ghost.remove(), 760);
-  }
+  const glow = document.createElement("div");
+  glow.className = "archiveGlow";
+  glow.style.left = `${toX}px`;
+  glow.style.top = `${toY}px`;
+  document.body.appendChild(glow);
+  setTimeout(() => glow.remove(), 900);
 
-  archiveBtn.classList.add("catching");
-  setTimeout(() => archiveBtn.classList.remove("catching"), 700);
-
-  for (let i = 0; i < 28; i++) {
+  for (let i = 0; i < 22; i++) {
     const p = document.createElement("div");
     p.className = "finishSpark" + (i % 7 === 0 ? " softStar" : "");
-    const startX = fromX + Math.random() * 120 - 60;
-    const startY = fromY + Math.random() * 90 - 45;
+    const startX = start.x + Math.random() * 74 - 37;
+    const startY = start.y + Math.random() * 52 - 26;
     p.style.left = `${startX}px`;
     p.style.top = `${startY}px`;
-    p.style.setProperty("--tx", `${toX - startX + Math.random() * 22 - 11}px`);
+    p.style.setProperty("--tx", `${toX - startX + Math.random() * 26 - 13}px`);
     p.style.setProperty("--ty", `${toY - startY + Math.random() * 22 - 11}px`);
     p.style.animationDelay = `${Math.random() * 0.22}s`;
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1150);
+    setTimeout(() => p.remove(), 1250);
   }
 }
 

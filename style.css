@@ -488,253 +488,198 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* v7.1 touch polish: keep v6 layout, add only small feeling changes */
-.tag { display: none; }
+/* v7.1 finish polish */
+.tag { display: none !important; }
+
+/* dialogs appear softly, not abruptly */
+dialog[open] {
+  animation: modalFloatIn .34s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+dialog[open]::backdrop {
+  animation: backdropSoftIn .32s ease both;
+}
+
+@keyframes modalFloatIn {
+  from { opacity: 0; transform: translateY(10px) scale(.965); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes backdropSoftIn {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(5px); }
+}
+
+#nextDialog {
+  transition: transform .34s cubic-bezier(.16, 1, .3, 1), opacity .26s ease;
+}
+
+/* small rounded treasure-box icon */
+.treasureIcon {
+  position: relative;
+  display: inline-block;
+  width: 23px;
+  height: 18px;
+  border: 2.2px solid currentColor;
+  border-radius: 7px 7px 6px 6px;
+  vertical-align: -4px;
+}
+
+.treasureIcon::before {
+  content: "";
+  position: absolute;
+  left: -2.2px;
+  right: -2.2px;
+  top: 5px;
+  height: 2.2px;
+  background: currentColor;
+  border-radius: 999px;
+  opacity: .92;
+}
+
+.treasureIcon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 5px;
+  height: 5px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  background: rgba(255,255,255,.42);
+  transform: translateX(-50%);
+}
 
 #archiveBtn {
   display: grid;
   place-items: center;
-  font-size: 0;
-  transition: transform .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease, opacity .24s ease;
+  color: #9a94a4;
 }
 
-.boxIcon {
-  position: relative;
-  display: inline-block;
-  width: 19px;
-  height: 15px;
-  border: 2px solid currentColor;
-  border-radius: 6px 6px 5px 5px;
-  color: #8d8798;
+#archiveBtn .treasureIcon {
+  width: 20px;
+  height: 16px;
+  border-width: 2px;
 }
 
-.boxIcon::before {
-  content: "";
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  top: -7px;
-  height: 7px;
-  border: 2px solid currentColor;
-  border-bottom: 0;
-  border-radius: 7px 7px 2px 2px;
+#archiveBtn .treasureIcon::before {
+  left: -2px;
+  right: -2px;
+  top: 5px;
+  height: 2px;
 }
 
-.boxIcon::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 4px;
+#archiveBtn .treasureIcon::after {
   width: 4px;
   height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  transform: translateX(-50%);
-  opacity: .45;
+  top: 2px;
+  border-width: 1.7px;
 }
 
-#archiveBtn.catching {
-  opacity: .96;
-  transform: scale(1.09);
-  box-shadow: 0 10px 28px rgba(255, 143, 192, .25), 0 0 0 8px rgba(255, 230, 245, .42);
-}
-
-.item.pressing {
-  transform: translateY(-1px) scale(.996);
-  box-shadow: 0 9px 24px rgba(90, 70, 130, .10);
-}
-
-.item.pressing::before,
-.item.holdReady::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  pointer-events: none;
-  opacity: .5;
-  background:
-    radial-gradient(circle at 78% 26%, rgba(255, 240, 190, .55) 0 2px, transparent 4px),
-    radial-gradient(circle at 84% 58%, rgba(255, 255, 255, .72) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 68% 74%, rgba(255, 218, 235, .45) 0 2px, transparent 5px);
-  animation: holdTwinkle .9s ease-in-out infinite alternate;
-}
-
-.item.holdReady {
-  transform: translateY(-2px) scale(.997);
-  filter: brightness(1.01);
-  box-shadow: 0 0 0 3px rgba(255, 166, 197, .12), 0 12px 30px rgba(180, 140, 255, .13);
-}
-
-@keyframes holdTwinkle {
-  from { opacity: .25; transform: scale(.995); }
-  to { opacity: .72; transform: scale(1.005); }
-}
-
-dialog.softOpen {
-  animation: dialogFade .26s cubic-bezier(.22, 1, .36, 1) both;
-}
-
-dialog.softOpen::backdrop {
-  animation: backdropFade .26s ease both;
-}
-
-dialog.softClose {
-  animation: dialogOut .15s ease both;
-}
-
-@keyframes dialogFade {
-  0% { opacity: 0; transform: translateY(8px) scale(.965); filter: blur(2px); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-@keyframes dialogOut {
-  to { opacity: 0; transform: translateY(4px) scale(.985); }
-}
-
-@keyframes backdropFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.nextForm {
-  transform-origin: center bottom;
-}
-
-.finishDialog {
-  width: min(88vw, 360px);
-  padding: 14px;
-  border-radius: 28px;
-  background: rgba(255,255,255,.94);
+#finishDialog {
+  width: min(86vw, 380px);
+  padding: 18px;
+  border-radius: 30px;
   overflow: visible;
 }
 
 .finishBox {
-  gap: 12px;
-  overflow: visible;
+  gap: 14px;
 }
 
-.finishBox::before {
-  content: "";
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  top: 6px;
-  height: 28px;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 12% 40%, rgba(255, 239, 180, .78) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 42% 20%, rgba(255, 255, 255, .9) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 78% 48%, rgba(255, 227, 245, .85) 0 1.5px, transparent 4px);
-  opacity: .55;
-}
-
-.finishChoice {
-  min-height: 58px;
+.finishBtn {
+  width: 100%;
+  height: 62px;
   border: 0;
-  border-radius: 20px;
-  display: grid;
-  grid-template-columns: 42px 1fr;
+  border-radius: 22px;
+  display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 0 22px 0 16px;
-  font-size: 16px;
+  justify-content: center;
+  gap: 12px;
+  font-size: 17px;
   font-weight: 900;
   letter-spacing: .02em;
-  box-shadow: 0 9px 24px rgba(90, 70, 130, .10);
-  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+  box-shadow: 0 10px 24px rgba(120, 95, 160, .13);
+  transition: transform .16s cubic-bezier(.16, 1, .3, 1), filter .16s ease;
 }
 
-.finishChoice:active {
-  transform: scale(.985);
-  filter: brightness(.995);
+.finishBtn:active {
+  transform: scale(.975);
+  filter: brightness(.98);
 }
 
-.finishKeep {
+.finishStore {
   color: white;
-  background: linear-gradient(135deg, #ff91c4, #df77ae);
-}
-
-.finishKeep .boxIcon {
-  color: white;
-  opacity: .94;
-  transform: scale(.96);
+  background: linear-gradient(135deg, #ff86bd, #df6ea7 70%, #d86ca0);
 }
 
 .finishBack {
-  color: #6f6680;
-  background: linear-gradient(135deg, #f5f0ff, #ded4ff);
+  color: #fff;
+  background: linear-gradient(135deg, #d9cdfa, #b9a7ee);
+}
+
+.finishBtn .treasureIcon {
+  width: 25px;
+  height: 20px;
 }
 
 .backIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
   font-size: 28px;
   line-height: 1;
-  color: rgba(111, 102, 128, .72);
 }
 
 .archiveTitle {
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 30px;
-}
-
-.archiveTitle .boxIcon {
   color: #d879aa;
 }
 
-.archiveGhost {
-  position: fixed;
-  z-index: 9997;
-  pointer-events: none;
-  border-radius: 16px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  overflow: hidden;
-  box-shadow: 0 8px 28px rgba(90, 70, 130, .10);
-  animation: ghostArchive .72s cubic-bezier(.22, 1, .36, 1) forwards;
+/* make the long-press feel present but quiet */
+.item.pressing {
+  transform: translateY(-1px) scale(.998);
+  box-shadow: 0 9px 24px rgba(90, 70, 130, .10);
 }
 
-.ghostInner {
-  height: 100%;
-  border-left: 6px solid var(--lineColor);
-  padding: 7px 10px 7px 13px;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--text);
+.item.holdReady {
+  transform: translateY(-2px) scale(.996);
+  box-shadow: 0 0 0 3px rgba(255, 166, 197, .12), 0 14px 34px rgba(180, 140, 255, .13);
 }
 
-.ghostInner span {
-  display: block;
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: 750;
-}
-
-@keyframes ghostArchive {
-  0% { opacity: .9; transform: translate(0, 0) scale(1); filter: blur(0); }
-  55% { opacity: .72; transform: translate(calc(var(--tx) * .46), calc(var(--ty) * .52)) scale(.72) rotate(1deg); filter: blur(.15px); }
-  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.22) rotate(4deg); filter: blur(1.2px); }
-}
-
+/* subtle sparkle flight into the storage box */
 .finishSpark {
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 246, 214, .96);
-  box-shadow: 0 0 7px rgba(255, 244, 210, .92), 0 0 16px rgba(255, 190, 120, .44);
-  animation: finishMagic 1.02s cubic-bezier(.22, .8, .22, 1) forwards;
+  width: 3.5px;
+  height: 3.5px;
+  opacity: .85;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 0 7px rgba(255, 240, 197, .78), 0 0 15px rgba(255, 196, 118, .38);
+  animation: finishMagic 1.08s cubic-bezier(.2, .8, .2, 1) forwards;
 }
 
 .finishSpark.softStar {
-  width: 7px;
-  height: 7px;
-  border-radius: 45% 55% 50% 50%;
-  background: rgba(255, 255, 255, .98);
-  box-shadow: 0 0 9px rgba(255, 252, 235, .95), 0 0 18px rgba(255, 214, 145, .42);
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 230, 170, .92);
 }
 
-@keyframes finishMagic {
-  0% { opacity: 0; transform: translate(0, 0) scale(.25); }
-  14% { opacity: .92; }
-  72% { opacity: .78; }
-  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.65); }
+.archiveGlow {
+  position: fixed;
+  z-index: 9998;
+  pointer-events: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 223, 162, .55);
+  box-shadow: 0 0 18px rgba(255, 202, 128, .55), 0 0 34px rgba(255, 142, 192, .25);
+  transform: translate(-50%, -50%) scale(.5);
+  animation: archiveGlowPop .78s ease-out forwards;
+}
+
+@keyframes archiveGlowPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
+  35% { opacity: .8; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(.75); }
 }
