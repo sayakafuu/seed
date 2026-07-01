@@ -1,4 +1,4 @@
-const TANE_VERSION = "v8.2";
+const TANE_VERSION = "v8.3";
 const COLORS = ["#7EDBD9", "#FFA6C5", "#BCEED8", "#BFD8FF", "#D8CBFF", "#FFF2B8", "#FFC48D", "#CAE96B"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -244,6 +244,10 @@ function openNext() {
   nextDialog.innerHTML = `
     <form method="dialog" class="dialogForm nextForm">
       <h2>次にやること</h2>
+      <div class="nextContext">
+        <div class="nextItemTitle">${h(card.title)}</div>
+        ${card.current ? `<div class="nextDone">✓ ${h(card.current)}</div>` : ""}
+      </div>
       <textarea id="nextInput" placeholder="次にやることを入力">${h(proposed)}</textarea>
       <div class="btns">
         <button class="btn" type="button" onclick="nextDialog.close()">キャンセル</button>
@@ -363,7 +367,6 @@ function sparkleFlowFromRect(rect) {
   document.body.appendChild(glow);
   setTimeout(() => glow.remove(), 1000);
 
-  // カード全体がまず光の粒になる
   for (let i = 0; i < 30; i++) {
     const dot = document.createElement("div");
     dot.className = "localTwinkle" + (i % 6 === 0 ? " star" : "");
@@ -376,7 +379,6 @@ function sparkleFlowFromRect(rect) {
     setTimeout(() => dot.remove(), 1100);
   }
 
-  // 光が保管庫までさらさら長めに流れる
   const count = 70;
   for (let i = 0; i < count; i++) {
     const p = document.createElement("div");

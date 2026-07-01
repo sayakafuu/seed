@@ -488,7 +488,7 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* v8.2：見た目を壊さず、編集画面・色選択・光の流れを調整 */
+/* v8.3：次にやることの文脈表示／しまうボタン復元／色リング修正 */
 :root {
   --cute-font: ui-rounded, "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -581,7 +581,7 @@ body {
   box-shadow: 0 0 0 5px rgba(255, 233, 185, .35), 0 12px 30px rgba(255, 190, 125, .22);
 }
 
-/* ダイアログ全体を少しAppleっぽく */
+/* Appleっぽい控えめダイアログ */
 dialog {
   background: rgba(255, 255, 255, .96);
   box-shadow: 0 24px 70px rgba(45, 38, 56, .20);
@@ -594,15 +594,15 @@ dialog::backdrop {
 }
 
 dialog[open] {
-  animation: dialogFloatInV82 .28s cubic-bezier(.2, .9, .28, 1) both;
+  animation: dialogFloatInV83 .28s cubic-bezier(.2, .9, .28, 1) both;
 }
 
-@keyframes dialogFloatInV82 {
+@keyframes dialogFloatInV83 {
   from { opacity: 0; transform: translateY(14px) scale(.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* 編集画面：保存が見えるように圧縮。ただしこのあと欄は内容が分かる高さ */
+/* 編集画面：保存ボタンを見える範囲に、色リング切れ修正 */
 #editDialog {
   width: min(92vw, 480px);
   max-height: 96vh;
@@ -649,7 +649,6 @@ dialog[open] {
   min-height: 34px;
 }
 
-/* 色選択：1列・リングが途切れない */
 #editDialog .editForm .colors {
   display: flex;
   flex-wrap: nowrap;
@@ -723,22 +722,124 @@ dialog[open] {
   background: transparent;
 }
 
-/* 次にやること画面 */
+/* 次にやること：何の項目か分かるように */
 #nextDialog {
-  width: min(86vw, 400px);
+  width: min(86vw, 410px);
   padding: 18px;
   border-radius: 25px;
 }
 
 #nextDialog .nextForm h2 {
-  margin-bottom: 12px;
+  margin-bottom: 11px;
   font-size: 17.5px;
 }
 
+.nextContext {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #faf7ff;
+  color: var(--text);
+}
+
+.nextItemTitle {
+  font-family: var(--cute-font);
+  font-size: 13.5px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.nextDone {
+  margin-top: 5px;
+  color: var(--sub);
+  font-size: 11.5px;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
 #nextDialog .nextForm textarea {
-  min-height: 72px;
+  min-height: 62px;
   font-size: 14.5px;
   border-radius: 15px;
+}
+
+/* しまう／戻す：前の可愛い大きいボタンに戻す */
+#finishDialog {
+  width: min(84vw, 390px);
+  padding: 18px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .96);
+}
+
+.finishBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.finishBtn {
+  width: 100%;
+  height: 56px;
+  border: 0;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--cute-font);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  box-shadow: 0 10px 24px rgba(100, 70, 120, .10);
+}
+
+.finishSave {
+  color: white;
+  background: linear-gradient(100deg, #ff8fc0, #df70aa);
+}
+
+.finishBack {
+  color: #675d72;
+  background: #f0edf7;
+}
+
+.miniChest {
+  width: 22px;
+  height: 18px;
+  position: relative;
+  border: 2.3px solid currentColor;
+  border-radius: 5px 5px 6px 6px;
+  opacity: .92;
+}
+
+.miniChest::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: -7px;
+  height: 8px;
+  border: 2.3px solid currentColor;
+  border-bottom: 0;
+  border-radius: 8px 8px 2px 2px;
+}
+
+.miniChest::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.backIcon {
+  font-size: 22px;
+  line-height: 1;
+  transform: translateY(-1px);
 }
 
 /* 長押し感 */
@@ -762,18 +863,18 @@ dialog[open] {
   border-radius: 50%;
   background: rgba(255, 238, 178, .92);
   box-shadow: 0 0 9px rgba(255, 219, 152, .56);
-  animation: holdSparkV82 .56s ease-out forwards;
+  animation: holdSparkV83 .56s ease-out forwards;
 }
 
-@keyframes holdSparkV82 {
+@keyframes holdSparkV83 {
   0% { opacity: 0; transform: scale(.2); }
   38% { opacity: .72; transform: scale(1); }
   100% { opacity: 0; transform: translateY(-9px) scale(.5); }
 }
 
-/* カードは移動せず、光にほどける */
+/* 保管演出：カードは移動せず光にほどける */
 .item.turningToLight {
-  animation: cardDissolveV82 .90s ease-out forwards;
+  animation: cardDissolveV83 .90s ease-out forwards;
   pointer-events: none;
 }
 
@@ -788,16 +889,16 @@ dialog[open] {
     radial-gradient(circle at 52% 50%, rgba(255, 255, 255, .82), transparent 28%),
     linear-gradient(110deg, transparent 0%, rgba(255, 230, 166, .50) 48%, transparent 74%);
   opacity: 0;
-  animation: cardBloomV82 .90s ease-out forwards;
+  animation: cardBloomV83 .90s ease-out forwards;
 }
 
-@keyframes cardDissolveV82 {
+@keyframes cardDissolveV83 {
   0% { filter: brightness(1); opacity: 1; }
   35% { filter: brightness(1.10); opacity: .96; box-shadow: 0 0 0 2px rgba(255, 229, 175, .42), 0 14px 32px rgba(255, 198, 120, .13); }
   100% { filter: brightness(1.16); opacity: .16; }
 }
 
-@keyframes cardBloomV82 {
+@keyframes cardBloomV83 {
   0% { opacity: 0; transform: scale(.98); }
   42% { opacity: .82; }
   100% { opacity: 0; transform: scale(1.035); }
@@ -812,10 +913,10 @@ dialog[open] {
     radial-gradient(circle at 24% 48%, rgba(255, 248, 220, .82), transparent 32%),
     radial-gradient(circle at 64% 48%, rgba(255, 255, 255, .65), transparent 36%);
   box-shadow: 0 0 24px rgba(255, 221, 152, .30);
-  animation: glowBurstV82 .92s ease-out forwards;
+  animation: glowBurstV83 .92s ease-out forwards;
 }
 
-@keyframes glowBurstV82 {
+@keyframes glowBurstV83 {
   0% { opacity: 0; transform: scale(.98); }
   25% { opacity: .82; }
   100% { opacity: 0; transform: scale(1.045); }
@@ -830,7 +931,7 @@ dialog[open] {
   border-radius: 50%;
   background: rgba(255, 247, 210, .95);
   box-shadow: 0 0 8px rgba(255, 224, 155, .62);
-  animation: localTwinkleV82 .95s ease-out forwards;
+  animation: localTwinkleV83 .95s ease-out forwards;
 }
 
 .localTwinkle.star {
@@ -839,7 +940,7 @@ dialog[open] {
   background: rgba(255, 255, 255, .96);
 }
 
-@keyframes localTwinkleV82 {
+@keyframes localTwinkleV83 {
   0% { opacity: 0; transform: scale(.2); }
   30% { opacity: .9; transform: scale(1); }
   100% { opacity: 0; transform: translateY(-12px) scale(.45); }
@@ -854,7 +955,7 @@ dialog[open] {
   border-radius: 50%;
   background: rgba(255, 255, 255, .94);
   box-shadow: 0 0 7px rgba(255, 244, 199, .86), 0 0 14px rgba(255, 198, 115, .38);
-  animation-name: finishFlowV82;
+  animation-name: finishFlowV83;
   animation-timing-function: cubic-bezier(.24, .88, .32, 1);
   animation-fill-mode: forwards;
 }
@@ -865,7 +966,7 @@ dialog[open] {
   background: rgba(255, 232, 171, .95);
 }
 
-@keyframes finishFlowV82 {
+@keyframes finishFlowV83 {
   0% { opacity: 0; transform: translate(0, 0) scale(.25); }
   15% { opacity: .86; }
   70% { opacity: .68; }
