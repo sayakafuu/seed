@@ -1,3 +1,4 @@
+const TANE_VERSION = "v8.1";
 const COLORS = ["#7EDBD9", "#FFA6C5", "#BCEED8", "#BFD8FF", "#D8CBFF", "#FFF2B8", "#FFC48D", "#CAE96B"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -283,20 +284,21 @@ function finishCard() {
 
   if (item && rect) {
     item.classList.add("turningToLight");
-    magicFromRect(rect);
-    vibrate([10, 40, 8]);
+    sparkleFlowFromRect(rect);
+    vibrate([8, 28, 8]);
+
     setTimeout(() => {
       const archived = state.cards.splice(finishIndex, 1)[0] || card;
       state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
       save();
       render();
-    }, 620);
+    }, 760);
   } else {
     const archived = state.cards.splice(finishIndex, 1)[0];
     if (archived) state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
     save();
     render();
-    magicFromRect(null);
+    sparkleFlowFromRect(null);
   }
 }
 
@@ -327,61 +329,65 @@ function showArchive() {
   archiveDialog.showModal();
 }
 
-function magicFromRect(rect) {
+function sparkleFlowFromRect(rect) {
   const target = archiveBtn.getBoundingClientRect();
   const toX = target.left + target.width / 2;
   const toY = target.top + target.height / 2;
-  const fromX = rect ? rect.left + rect.width * 0.42 : window.innerWidth * 0.52;
+  const fromX = rect ? rect.left + rect.width * 0.48 : window.innerWidth * 0.52;
   const fromY = rect ? rect.top + rect.height * 0.50 : window.innerHeight * 0.55;
-  const width = rect ? rect.width : 160;
+  const width = rect ? rect.width : 170;
   const height = rect ? rect.height : 70;
 
   const glow = document.createElement("div");
   glow.className = "cardGlowBurst";
-  glow.style.left = `${rect ? rect.left : fromX - 80}px`;
+  glow.style.left = `${rect ? rect.left : fromX - 85}px`;
   glow.style.top = `${rect ? rect.top : fromY - 35}px`;
   glow.style.width = `${width}px`;
   glow.style.height = `${height}px`;
   document.body.appendChild(glow);
-  setTimeout(() => glow.remove(), 820);
+  setTimeout(() => glow.remove(), 900);
 
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 22; i++) {
     const dot = document.createElement("div");
-    dot.className = "localTwinkle" + (i % 5 === 0 ? " star" : "");
+    dot.className = "localTwinkle" + (i % 6 === 0 ? " star" : "");
     const sx = fromX + (Math.random() - .5) * width * .78;
-    const sy = fromY + (Math.random() - .5) * height * .92;
+    const sy = fromY + (Math.random() - .5) * height * .95;
     dot.style.left = `${sx}px`;
     dot.style.top = `${sy}px`;
-    dot.style.animationDelay = `${Math.random() * .16}s`;
+    dot.style.animationDelay = `${Math.random() * .18}s`;
     document.body.appendChild(dot);
-    setTimeout(() => dot.remove(), 760);
+    setTimeout(() => dot.remove(), 850);
   }
 
-  const count = 42;
+  const count = 52;
   for (let i = 0; i < count; i++) {
     const p = document.createElement("div");
-    p.className = "finishSpark" + (i % 8 === 0 ? " softStar" : "");
-    const startX = fromX + (Math.random() - .5) * width * .72;
-    const startY = fromY + (Math.random() - .5) * height * .86;
+    p.className = "finishSpark" + (i % 9 === 0 ? " softStar" : "");
+    const startX = fromX + (Math.random() - .5) * width * .70;
+    const startY = fromY + (Math.random() - .5) * height * .90;
     const drift = i / count;
-    const curveX = (Math.random() - .5) * 42 - 18 * drift;
-    const curveY = -26 - Math.random() * 42 + 16 * drift;
+    const curveX = (Math.random() - .5) * 46 - 22 * drift;
+    const curveY = -32 - Math.random() * 50 + 20 * drift;
     p.style.left = `${startX}px`;
     p.style.top = `${startY}px`;
     p.style.setProperty("--tx", `${toX - startX + curveX}px`);
     p.style.setProperty("--ty", `${toY - startY + curveY}px`);
-    p.style.animationDelay = `${0.08 + i * 0.012 + Math.random() * .12}s`;
-    p.style.animationDuration = `${.82 + Math.random() * .34}s`;
+    p.style.animationDelay = `${0.08 + i * 0.010 + Math.random() * .10}s`;
+    p.style.animationDuration = `${0.92 + Math.random() * .38}s`;
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1450);
+    setTimeout(() => p.remove(), 1600);
   }
 
   archiveBtn.classList.add("receivingLight");
-  setTimeout(() => archiveBtn.classList.remove("receivingLight"), 860);
+  setTimeout(() => archiveBtn.classList.remove("receivingLight"), 980);
+}
+
+function magicFromRect(rect) {
+  sparkleFlowFromRect(rect);
 }
 
 function magic() {
-  magicFromRect(null);
+  sparkleFlowFromRect(null);
 }
 
 function vibrate(pattern) {
