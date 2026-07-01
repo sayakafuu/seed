@@ -1,4 +1,4 @@
-const TANE_VERSION = "v8.1";
+const TANE_VERSION = "v8.2";
 const COLORS = ["#7EDBD9", "#FFA6C5", "#BCEED8", "#BFD8FF", "#D8CBFF", "#FFF2B8", "#FFC48D", "#CAE96B"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -104,9 +104,12 @@ function createCard(card, index) {
       finishIndex = index;
       item.classList.remove("pressing");
       item.classList.add("holdReady");
+      sprinkleHoldLight(item);
       vibrate([8, 34, 12]);
-      setTimeout(() => item.classList.remove("holdReady"), 260);
-      openFinish();
+      setTimeout(() => {
+        item.classList.remove("holdReady");
+        openFinish();
+      }, 180);
     }, 760);
   }, { passive: true });
 
@@ -173,7 +176,7 @@ function openEdit(index, category) {
       <label for="current">今できること</label>
       <textarea id="current">${h(card.current)}</textarea>
       <label for="queue">このあと</label>
-      <textarea id="queue" class="queue" placeholder="1行ずつ書く">${h(card.queue.join("\n"))}</textarea>
+      <textarea id="queue" class="queue" placeholder="このあとを1行ずつ書く">${h(card.queue.join("\n"))}</textarea>
       ${historyHtml}
       <label for="memo">メモ</label>
       <textarea id="memo">${h(card.memo)}</textarea>
@@ -292,7 +295,7 @@ function finishCard() {
       state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
       save();
       render();
-    }, 760);
+    }, 900);
   } else {
     const archived = state.cards.splice(finishIndex, 1)[0];
     if (archived) state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
@@ -329,11 +332,24 @@ function showArchive() {
   archiveDialog.showModal();
 }
 
+function sprinkleHoldLight(item) {
+  const rect = item.getBoundingClientRect();
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement("div");
+    p.className = "holdSpark";
+    p.style.left = `${rect.left + rect.width * (.18 + Math.random() * .64)}px`;
+    p.style.top = `${rect.top + rect.height * (.18 + Math.random() * .64)}px`;
+    p.style.animationDelay = `${Math.random() * .12}s`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 620);
+  }
+}
+
 function sparkleFlowFromRect(rect) {
   const target = archiveBtn.getBoundingClientRect();
   const toX = target.left + target.width / 2;
   const toY = target.top + target.height / 2;
-  const fromX = rect ? rect.left + rect.width * 0.48 : window.innerWidth * 0.52;
+  const fromX = rect ? rect.left + rect.width * 0.50 : window.innerWidth * 0.52;
   const fromY = rect ? rect.top + rect.height * 0.50 : window.innerHeight * 0.55;
   const width = rect ? rect.width : 170;
   const height = rect ? rect.height : 70;
@@ -345,41 +361,43 @@ function sparkleFlowFromRect(rect) {
   glow.style.width = `${width}px`;
   glow.style.height = `${height}px`;
   document.body.appendChild(glow);
-  setTimeout(() => glow.remove(), 900);
+  setTimeout(() => glow.remove(), 1000);
 
-  for (let i = 0; i < 22; i++) {
+  // カード全体がまず光の粒になる
+  for (let i = 0; i < 30; i++) {
     const dot = document.createElement("div");
     dot.className = "localTwinkle" + (i % 6 === 0 ? " star" : "");
-    const sx = fromX + (Math.random() - .5) * width * .78;
+    const sx = fromX + (Math.random() - .5) * width * .82;
     const sy = fromY + (Math.random() - .5) * height * .95;
     dot.style.left = `${sx}px`;
     dot.style.top = `${sy}px`;
-    dot.style.animationDelay = `${Math.random() * .18}s`;
+    dot.style.animationDelay = `${Math.random() * .22}s`;
     document.body.appendChild(dot);
-    setTimeout(() => dot.remove(), 850);
+    setTimeout(() => dot.remove(), 1100);
   }
 
-  const count = 52;
+  // 光が保管庫までさらさら長めに流れる
+  const count = 70;
   for (let i = 0; i < count; i++) {
     const p = document.createElement("div");
     p.className = "finishSpark" + (i % 9 === 0 ? " softStar" : "");
-    const startX = fromX + (Math.random() - .5) * width * .70;
-    const startY = fromY + (Math.random() - .5) * height * .90;
+    const startX = fromX + (Math.random() - .5) * width * .72;
+    const startY = fromY + (Math.random() - .5) * height * .92;
     const drift = i / count;
-    const curveX = (Math.random() - .5) * 46 - 22 * drift;
-    const curveY = -32 - Math.random() * 50 + 20 * drift;
+    const curveX = (Math.random() - .5) * 54 - 26 * drift;
+    const curveY = -36 - Math.random() * 62 + 24 * drift;
     p.style.left = `${startX}px`;
     p.style.top = `${startY}px`;
     p.style.setProperty("--tx", `${toX - startX + curveX}px`);
     p.style.setProperty("--ty", `${toY - startY + curveY}px`);
-    p.style.animationDelay = `${0.08 + i * 0.010 + Math.random() * .10}s`;
-    p.style.animationDuration = `${0.92 + Math.random() * .38}s`;
+    p.style.animationDelay = `${0.10 + i * 0.013 + Math.random() * .11}s`;
+    p.style.animationDuration = `${1.10 + Math.random() * .48}s`;
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1600);
+    setTimeout(() => p.remove(), 2200);
   }
 
   archiveBtn.classList.add("receivingLight");
-  setTimeout(() => archiveBtn.classList.remove("receivingLight"), 980);
+  setTimeout(() => archiveBtn.classList.remove("receivingLight"), 1300);
 }
 
 function magicFromRect(rect) {
