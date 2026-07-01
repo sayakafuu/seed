@@ -807,3 +807,371 @@ dialog h2 {
     height: 27px;
   }
 }
+
+/* v8: seedらしい軽さと見やすさの仕上げ */
+:root {
+  --cute-font: ui-rounded, "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.groupName {
+  font-family: var(--cute-font);
+  font-size: 16.2px;
+  font-weight: 880;
+  letter-spacing: .015em;
+}
+
+.title {
+  font-family: var(--cute-font);
+  font-size: 14.8px;
+  font-weight: 840;
+  letter-spacing: .012em;
+}
+
+.now {
+  font-family: var(--cute-font);
+  font-size: 12.9px;
+  font-weight: 720;
+  letter-spacing: .006em;
+}
+
+.memo {
+  font-family: var(--cute-font);
+  font-size: 10.8px;
+}
+
+.queueMini,
+.tag {
+  display: none !important;
+}
+
+/* simple rounded storage box */
+#archiveBtn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 17px;
+  color: #9a90a2;
+  background: rgba(255, 255, 255, .88);
+  transition: transform .24s cubic-bezier(.2, .9, .25, 1), box-shadow .24s ease, opacity .24s ease;
+}
+
+.boxIcon,
+.archiveIcon {
+  width: 23px;
+  height: 20px;
+  position: relative;
+  display: block;
+}
+
+.boxIcon::before,
+.archiveIcon::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 1px;
+  height: 14px;
+  border: 2.2px solid currentColor;
+  border-radius: 5px 5px 7px 7px;
+}
+
+.boxIcon::after,
+.archiveIcon::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 0;
+  height: 8px;
+  border: 2.2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 8px 8px 2px 2px;
+}
+
+#archiveBtn.receivingLight {
+  transform: translateY(-2px) scale(1.08);
+  opacity: .94;
+  box-shadow: 0 0 0 5px rgba(255, 233, 185, .35), 0 12px 30px rgba(255, 190, 125, .22);
+}
+
+/* compact edit dialog */
+#editDialog {
+  width: min(92vw, 480px);
+  max-height: 96vh;
+  padding: 13px 14px 14px;
+  overflow: hidden;
+}
+
+#editDialog .editForm h2 {
+  margin: 0 0 7px;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+#editDialog .editForm label,
+#editDialog .editForm .historyTitle {
+  margin: 7px 0 3px;
+  font-size: 10.5px;
+  line-height: 1.1;
+}
+
+#editDialog .editForm input,
+#editDialog .editForm textarea,
+#editDialog .editForm select {
+  border-radius: 14px;
+  padding: 8px 10px;
+  font-size: 14.5px;
+  line-height: 1.25;
+}
+
+#editDialog .editForm input,
+#editDialog .editForm select {
+  height: 42px;
+}
+
+#editDialog .editForm textarea {
+  min-height: 46px;
+}
+
+#editDialog .editForm textarea.queue {
+  min-height: 42px;
+}
+
+#editDialog .editForm #memo {
+  min-height: 38px;
+}
+
+#editDialog .editForm .colors {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-top: 6px;
+  overflow-x: auto;
+  padding: 3px 1px 5px;
+  scrollbar-width: none;
+}
+
+#editDialog .editForm .colors::-webkit-scrollbar {
+  display: none;
+}
+
+#editDialog .editForm .sw {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+}
+
+#editDialog .editForm .sw.sel {
+  outline: 3px solid #fff;
+  box-shadow: 0 0 0 4px #ffa6c5, 0 7px 16px rgba(120, 95, 180, .15);
+  transform: scale(1.12);
+}
+
+#editDialog .editForm .sw.sel::after {
+  font-size: 15px;
+}
+
+#editDialog .editForm .btns {
+  margin-top: 10px;
+}
+
+#editDialog .editForm .btn {
+  height: 42px;
+  font-size: 14.5px;
+}
+
+.historyWrap {
+  margin-top: 7px;
+  border-radius: 13px;
+  background: #faf7ff;
+  color: #8b8798;
+  font-size: 12px;
+}
+
+.historyWrap summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 10px;
+  font-weight: 800;
+  color: var(--sub);
+}
+
+.historyWrap summary::-webkit-details-marker {
+  display: none;
+}
+
+.historyWrap summary::after {
+  content: "›";
+  float: right;
+  transform: rotate(90deg);
+  opacity: .65;
+}
+
+.historyWrap[open] summary::after {
+  transform: rotate(-90deg);
+}
+
+.historyWrap .history {
+  margin: 0;
+  padding: 0 10px 8px;
+  background: transparent;
+}
+
+/* next dialog stays soft */
+#nextDialog {
+  width: min(86vw, 400px);
+  padding: 18px;
+  border-radius: 25px;
+}
+
+#nextDialog .nextForm h2 {
+  margin-bottom: 12px;
+  font-size: 17.5px;
+}
+
+#nextDialog .nextForm textarea {
+  min-height: 72px;
+  font-size: 14.5px;
+  border-radius: 15px;
+}
+
+dialog[open] {
+  animation: dialogFloatIn .26s cubic-bezier(.2, .9, .28, 1) both;
+}
+
+@keyframes dialogFloatIn {
+  from { opacity: 0; transform: translateY(12px) scale(.972); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* dissolve card into light */
+.item.turningToLight {
+  animation: cardDissolveV8 .62s ease-out forwards;
+  pointer-events: none;
+}
+
+.item.turningToLight::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 45%, rgba(255, 250, 225, .96), transparent 26%),
+    radial-gradient(circle at 52% 50%, rgba(255, 255, 255, .82), transparent 28%),
+    linear-gradient(110deg, transparent 0%, rgba(255, 230, 166, .48) 48%, transparent 74%);
+  opacity: 0;
+  animation: cardBloomV8 .62s ease-out forwards;
+}
+
+@keyframes cardDissolveV8 {
+  0% { filter: brightness(1); opacity: 1; }
+  38% { filter: brightness(1.10); opacity: .96; box-shadow: 0 0 0 2px rgba(255, 229, 175, .42), 0 14px 32px rgba(255, 198, 120, .13); }
+  100% { filter: brightness(1.16); opacity: .22; }
+}
+
+@keyframes cardBloomV8 {
+  0% { opacity: 0; transform: scale(.98); }
+  42% { opacity: .82; }
+  100% { opacity: 0; transform: scale(1.035); }
+}
+
+.cardGlowBurst {
+  position: fixed;
+  z-index: 9998;
+  pointer-events: none;
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 24% 48%, rgba(255, 248, 220, .82), transparent 32%),
+    radial-gradient(circle at 64% 48%, rgba(255, 255, 255, .65), transparent 36%);
+  box-shadow: 0 0 24px rgba(255, 221, 152, .30);
+  animation: glowBurstV8 .72s ease-out forwards;
+}
+
+@keyframes glowBurstV8 {
+  0% { opacity: 0; transform: scale(.98); }
+  25% { opacity: .82; }
+  100% { opacity: 0; transform: scale(1.045); }
+}
+
+.localTwinkle {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 247, 210, .95);
+  box-shadow: 0 0 8px rgba(255, 224, 155, .62);
+  animation: localTwinkleV8 .62s ease-out forwards;
+}
+
+.localTwinkle.star {
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, .96);
+}
+
+@keyframes localTwinkleV8 {
+  0% { opacity: 0; transform: scale(.2); }
+  30% { opacity: .9; transform: scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(.45); }
+}
+
+.finishSpark {
+  width: 3.5px;
+  height: 3.5px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 0 7px rgba(255, 244, 199, .86), 0 0 14px rgba(255, 198, 115, .38);
+  animation-name: finishFlowV8;
+  animation-timing-function: cubic-bezier(.24, .88, .32, 1);
+}
+
+.finishSpark.softStar {
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 232, 171, .95);
+}
+
+@keyframes finishFlowV8 {
+  0% { opacity: 0; transform: translate(0, 0) scale(.25); }
+  15% { opacity: .86; }
+  68% { opacity: .68; }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.86); }
+}
+
+@media (max-width: 430px) {
+  #editDialog {
+    width: calc(100vw - 28px);
+    padding: 12px 13px 13px;
+  }
+
+  #editDialog .editForm input,
+  #editDialog .editForm select {
+    height: 40px;
+  }
+
+  #editDialog .editForm textarea {
+    min-height: 43px;
+  }
+
+  #editDialog .editForm textarea.queue {
+    min-height: 38px;
+  }
+
+  #editDialog .editForm #memo {
+    min-height: 36px;
+  }
+
+  #editDialog .editForm .sw {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+  }
+}

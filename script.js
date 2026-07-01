@@ -156,8 +156,10 @@ function openEdit(index, category) {
 
   selectedColor = card.color || COLORS[0];
   const historyHtml = card.history.length ? `
-    <div class="historyTitle">これまで</div>
-    <div class="history">${card.history.map(x => `<div>✓ ${h(x)}</div>`).join("")}</div>
+    <details class="historyWrap">
+      <summary>これまで</summary>
+      <div class="history">${card.history.map(x => `<div>✓ ${h(x)}</div>`).join("")}</div>
+    </details>
   ` : "";
 
   editDialog.innerHTML = `
@@ -288,7 +290,7 @@ function finishCard() {
       state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
       save();
       render();
-    }, 520);
+    }, 620);
   } else {
     const archived = state.cards.splice(finishIndex, 1)[0];
     if (archived) state.archive.unshift({ ...archived, archivedAt: new Date().toISOString() });
@@ -329,8 +331,8 @@ function magicFromRect(rect) {
   const target = archiveBtn.getBoundingClientRect();
   const toX = target.left + target.width / 2;
   const toY = target.top + target.height / 2;
-  const fromX = rect ? rect.left + rect.width * 0.35 : window.innerWidth * 0.52;
-  const fromY = rect ? rect.top + rect.height * 0.48 : window.innerHeight * 0.55;
+  const fromX = rect ? rect.left + rect.width * 0.42 : window.innerWidth * 0.52;
+  const fromY = rect ? rect.top + rect.height * 0.50 : window.innerHeight * 0.55;
   const width = rect ? rect.width : 160;
   const height = rect ? rect.height : 70;
 
@@ -341,24 +343,41 @@ function magicFromRect(rect) {
   glow.style.width = `${width}px`;
   glow.style.height = `${height}px`;
   document.body.appendChild(glow);
-  setTimeout(() => glow.remove(), 720);
+  setTimeout(() => glow.remove(), 820);
 
-  for (let i = 0; i < 34; i++) {
+  for (let i = 0; i < 16; i++) {
+    const dot = document.createElement("div");
+    dot.className = "localTwinkle" + (i % 5 === 0 ? " star" : "");
+    const sx = fromX + (Math.random() - .5) * width * .78;
+    const sy = fromY + (Math.random() - .5) * height * .92;
+    dot.style.left = `${sx}px`;
+    dot.style.top = `${sy}px`;
+    dot.style.animationDelay = `${Math.random() * .16}s`;
+    document.body.appendChild(dot);
+    setTimeout(() => dot.remove(), 760);
+  }
+
+  const count = 42;
+  for (let i = 0; i < count; i++) {
     const p = document.createElement("div");
-    p.className = "finishSpark" + (i % 7 === 0 ? " softStar" : "");
-    const startX = fromX + (Math.random() - .5) * width * .75;
-    const startY = fromY + (Math.random() - .5) * height * .95;
-    const curveX = (Math.random() - .5) * 54;
-    const curveY = -20 - Math.random() * 46;
+    p.className = "finishSpark" + (i % 8 === 0 ? " softStar" : "");
+    const startX = fromX + (Math.random() - .5) * width * .72;
+    const startY = fromY + (Math.random() - .5) * height * .86;
+    const drift = i / count;
+    const curveX = (Math.random() - .5) * 42 - 18 * drift;
+    const curveY = -26 - Math.random() * 42 + 16 * drift;
     p.style.left = `${startX}px`;
     p.style.top = `${startY}px`;
     p.style.setProperty("--tx", `${toX - startX + curveX}px`);
     p.style.setProperty("--ty", `${toY - startY + curveY}px`);
-    p.style.animationDelay = `${Math.random() * .18}s`;
-    p.style.animationDuration = `${.72 + Math.random() * .35}s`;
+    p.style.animationDelay = `${0.08 + i * 0.012 + Math.random() * .12}s`;
+    p.style.animationDuration = `${.82 + Math.random() * .34}s`;
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1250);
+    setTimeout(() => p.remove(), 1450);
   }
+
+  archiveBtn.classList.add("receivingLight");
+  setTimeout(() => archiveBtn.classList.remove("receivingLight"), 860);
 }
 
 function magic() {
