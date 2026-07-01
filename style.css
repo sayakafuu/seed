@@ -488,253 +488,322 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* v7.1 touch polish: keep v6 layout, add only small feeling changes */
-.tag { display: none; }
+/* v7.2 fine tune: v6の雰囲気を残したまま、触り心地だけ調整 */
+:root {
+  --cute-font: ui-rounded, "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic UI", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+dialog {
+  outline: none;
+}
+
+dialog[open] {
+  animation: dialogFloatIn .24s cubic-bezier(.2, .9, .28, 1) both;
+}
+
+@keyframes dialogFloatIn {
+  from { opacity: 0; transform: translateY(10px) scale(.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.groupName,
+.title,
+.now,
+.btn,
+.finishBtn,
+dialog h2 {
+  font-family: var(--cute-font);
+}
+
+.groupName {
+  font-size: 15.5px;
+  letter-spacing: .01em;
+}
+
+.title {
+  font-size: 14.5px;
+  letter-spacing: .015em;
+  line-height: 1.28;
+}
+
+.now {
+  margin-top: 7px;
+  font-size: 12.8px;
+  font-weight: 760;
+  letter-spacing: .01em;
+}
+
+.memo {
+  font-size: 10.8px;
+}
 
 #archiveBtn {
   display: grid;
   place-items: center;
-  font-size: 0;
-  transition: transform .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease, opacity .24s ease;
+  color: #94899c;
+  background: rgba(255, 255, 255, .86);
 }
 
-.boxIcon {
+.archiveIcon {
+  width: 23px;
+  height: 23px;
+  display: block;
+}
+
+/* 編集画面は、スクロールしなくても保存が見えやすいように圧縮 */
+#editDialog {
+  padding: 14px;
+  max-height: 94vh;
+}
+
+#editDialog .editForm h2 {
+  margin-bottom: 9px;
+  font-size: 20px;
+}
+
+#editDialog .editForm label,
+#editDialog .editForm .historyTitle {
+  margin: 8px 0 4px;
+  font-size: 11px;
+}
+
+#editDialog .editForm input,
+#editDialog .editForm textarea,
+#editDialog .editForm select {
+  border-radius: 14px;
+  padding: 9px 11px;
+  font-size: 15px;
+}
+
+#editDialog .editForm textarea {
+  min-height: 50px;
+}
+
+#editDialog .editForm textarea.queue {
+  min-height: 54px;
+}
+
+#editDialog .editForm #memo {
+  min-height: 42px;
+}
+
+#editDialog .editForm .colors {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+#editDialog .editForm .sw {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+#editDialog .editForm .sw.sel {
+  box-shadow: 0 0 0 4px #ffa6c5, 0 8px 18px rgba(120, 95, 180, .16);
+  transform: scale(1.14);
+}
+
+#editDialog .editForm .sw.sel::after {
+  font-size: 16px;
+}
+
+#editDialog .editForm .btns {
+  margin-top: 14px;
+}
+
+#editDialog .editForm .btn {
+  height: 42px;
+}
+
+/* 次にやること画面の「ズンッ」をやめて、ふわっと */
+#nextDialog {
+  width: min(82vw, 420px);
+  padding: 18px;
+  border-radius: 24px;
+}
+
+#nextDialog .nextForm h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+#nextDialog .nextForm textarea {
+  min-height: 74px;
+  font-size: 15px;
+  border-radius: 15px;
+}
+
+#nextDialog .nextForm .btns {
+  margin-top: 16px;
+}
+
+/* 長押し後の選択ボタン */
+#finishDialog {
+  width: min(84vw, 390px);
+  padding: 18px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .96);
+}
+
+.finishBox {
+  gap: 12px;
+}
+
+.finishBtn {
+  width: 100%;
+  height: 56px;
+  border: 0;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  box-shadow: 0 10px 24px rgba(100, 70, 120, .10);
+}
+
+.finishSave {
+  color: white;
+  background: linear-gradient(100deg, #ff8fc0, #df70aa);
+}
+
+.finishBack {
+  color: #675d72;
+  background: #f0edf7;
+}
+
+.miniChest {
+  width: 22px;
+  height: 18px;
   position: relative;
-  display: inline-block;
-  width: 19px;
-  height: 15px;
-  border: 2px solid currentColor;
-  border-radius: 6px 6px 5px 5px;
-  color: #8d8798;
+  border: 2.3px solid currentColor;
+  border-radius: 5px 5px 6px 6px;
+  opacity: .92;
 }
 
-.boxIcon::before {
+.miniChest::before {
   content: "";
   position: absolute;
   left: 3px;
   right: 3px;
   top: -7px;
-  height: 7px;
-  border: 2px solid currentColor;
+  height: 8px;
+  border: 2.3px solid currentColor;
   border-bottom: 0;
-  border-radius: 7px 7px 2px 2px;
+  border-radius: 8px 8px 2px 2px;
 }
 
-.boxIcon::after {
+.miniChest::after {
   content: "";
   position: absolute;
   left: 50%;
-  top: 4px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+  top: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
   background: currentColor;
   transform: translateX(-50%);
-  opacity: .45;
 }
 
-#archiveBtn.catching {
-  opacity: .96;
-  transform: scale(1.09);
-  box-shadow: 0 10px 28px rgba(255, 143, 192, .25), 0 0 0 8px rgba(255, 230, 245, .42);
+.backIcon {
+  font-size: 22px;
+  line-height: 1;
+  transform: translateY(-1px);
 }
 
-.item.pressing {
-  transform: translateY(-1px) scale(.996);
-  box-shadow: 0 9px 24px rgba(90, 70, 130, .10);
+/* カードが光にほどける。カード自体を保管庫へ動かしすぎない */
+.item.turningToLight {
+  animation: cardToLight .52s ease-out forwards;
+  pointer-events: none;
 }
 
-.item.pressing::before,
-.item.holdReady::before {
+.item.turningToLight::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  pointer-events: none;
-  opacity: .5;
   background:
-    radial-gradient(circle at 78% 26%, rgba(255, 240, 190, .55) 0 2px, transparent 4px),
-    radial-gradient(circle at 84% 58%, rgba(255, 255, 255, .72) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 68% 74%, rgba(255, 218, 235, .45) 0 2px, transparent 5px);
-  animation: holdTwinkle .9s ease-in-out infinite alternate;
-}
-
-.item.holdReady {
-  transform: translateY(-2px) scale(.997);
-  filter: brightness(1.01);
-  box-shadow: 0 0 0 3px rgba(255, 166, 197, .12), 0 12px 30px rgba(180, 140, 255, .13);
-}
-
-@keyframes holdTwinkle {
-  from { opacity: .25; transform: scale(.995); }
-  to { opacity: .72; transform: scale(1.005); }
-}
-
-dialog.softOpen {
-  animation: dialogFade .26s cubic-bezier(.22, 1, .36, 1) both;
-}
-
-dialog.softOpen::backdrop {
-  animation: backdropFade .26s ease both;
-}
-
-dialog.softClose {
-  animation: dialogOut .15s ease both;
-}
-
-@keyframes dialogFade {
-  0% { opacity: 0; transform: translateY(8px) scale(.965); filter: blur(2px); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-@keyframes dialogOut {
-  to { opacity: 0; transform: translateY(4px) scale(.985); }
-}
-
-@keyframes backdropFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.nextForm {
-  transform-origin: center bottom;
-}
-
-.finishDialog {
-  width: min(88vw, 360px);
-  padding: 14px;
-  border-radius: 28px;
-  background: rgba(255,255,255,.94);
-  overflow: visible;
-}
-
-.finishBox {
-  gap: 12px;
-  overflow: visible;
-}
-
-.finishBox::before {
-  content: "";
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  top: 6px;
-  height: 28px;
+    radial-gradient(circle at 22% 45%, rgba(255, 250, 224, .9), transparent 23%),
+    radial-gradient(circle at 68% 40%, rgba(255, 255, 255, .9), transparent 20%),
+    linear-gradient(115deg, transparent 0%, rgba(255, 237, 179, .55) 45%, transparent 70%);
+  opacity: 0;
+  animation: lightBloom .52s ease-out forwards;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 12% 40%, rgba(255, 239, 180, .78) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 42% 20%, rgba(255, 255, 255, .9) 0 1.5px, transparent 4px),
-    radial-gradient(circle at 78% 48%, rgba(255, 227, 245, .85) 0 1.5px, transparent 4px);
-  opacity: .55;
 }
 
-.finishChoice {
-  min-height: 58px;
-  border: 0;
-  border-radius: 20px;
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  align-items: center;
-  gap: 2px;
-  padding: 0 22px 0 16px;
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: .02em;
-  box-shadow: 0 9px 24px rgba(90, 70, 130, .10);
-  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+@keyframes cardToLight {
+  0% { filter: brightness(1); }
+  45% { filter: brightness(1.08); box-shadow: 0 0 0 2px rgba(255, 231, 174, .45), 0 14px 32px rgba(255, 198, 120, .14); }
+  100% { filter: brightness(1.13); opacity: .32; }
 }
 
-.finishChoice:active {
-  transform: scale(.985);
-  filter: brightness(.995);
+@keyframes lightBloom {
+  0% { opacity: 0; transform: scale(.96); }
+  40% { opacity: .72; }
+  100% { opacity: 0; transform: scale(1.03); }
 }
 
-.finishKeep {
-  color: white;
-  background: linear-gradient(135deg, #ff91c4, #df77ae);
-}
-
-.finishKeep .boxIcon {
-  color: white;
-  opacity: .94;
-  transform: scale(.96);
-}
-
-.finishBack {
-  color: #6f6680;
-  background: linear-gradient(135deg, #f5f0ff, #ded4ff);
-}
-
-.backIcon {
-  font-size: 28px;
-  line-height: 1;
-  color: rgba(111, 102, 128, .72);
-}
-
-.archiveTitle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-}
-
-.archiveTitle .boxIcon {
-  color: #d879aa;
-}
-
-.archiveGhost {
+.cardGlowBurst {
   position: fixed;
-  z-index: 9997;
+  z-index: 9998;
   pointer-events: none;
-  border-radius: 16px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  overflow: hidden;
-  box-shadow: 0 8px 28px rgba(90, 70, 130, .10);
-  animation: ghostArchive .72s cubic-bezier(.22, 1, .36, 1) forwards;
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 20% 45%, rgba(255, 247, 218, .82), transparent 30%),
+    radial-gradient(circle at 65% 50%, rgba(255, 255, 255, .7), transparent 34%);
+  box-shadow: 0 0 24px rgba(255, 221, 152, .32);
+  animation: glowBurst .68s ease-out forwards;
 }
 
-.ghostInner {
-  height: 100%;
-  border-left: 6px solid var(--lineColor);
-  padding: 7px 10px 7px 13px;
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--text);
-}
-
-.ghostInner span {
-  display: block;
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: 750;
-}
-
-@keyframes ghostArchive {
-  0% { opacity: .9; transform: translate(0, 0) scale(1); filter: blur(0); }
-  55% { opacity: .72; transform: translate(calc(var(--tx) * .46), calc(var(--ty) * .52)) scale(.72) rotate(1deg); filter: blur(.15px); }
-  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.22) rotate(4deg); filter: blur(1.2px); }
+@keyframes glowBurst {
+  0% { opacity: 0; transform: scale(.98); }
+  24% { opacity: .85; }
+  100% { opacity: 0; transform: scale(1.04); }
 }
 
 .finishSpark {
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 246, 214, .96);
-  box-shadow: 0 0 7px rgba(255, 244, 210, .92), 0 0 16px rgba(255, 190, 120, .44);
-  animation: finishMagic 1.02s cubic-bezier(.22, .8, .22, 1) forwards;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 0 7px rgba(255, 244, 199, .85), 0 0 14px rgba(255, 198, 115, .42);
+  animation-name: finishFlow;
+  animation-timing-function: cubic-bezier(.24, .88, .32, 1);
 }
 
 .finishSpark.softStar {
-  width: 7px;
-  height: 7px;
-  border-radius: 45% 55% 50% 50%;
-  background: rgba(255, 255, 255, .98);
-  box-shadow: 0 0 9px rgba(255, 252, 235, .95), 0 0 18px rgba(255, 214, 145, .42);
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 232, 171, .95);
 }
 
-@keyframes finishMagic {
+@keyframes finishFlow {
   0% { opacity: 0; transform: translate(0, 0) scale(.25); }
-  14% { opacity: .92; }
-  72% { opacity: .78; }
-  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.65); }
+  14% { opacity: .85; }
+  70% { opacity: .72; }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.9); }
+}
+
+@media (max-width: 430px) {
+  #editDialog {
+    width: calc(100vw - 28px);
+    padding: 13px;
+  }
+  #editDialog .editForm input,
+  #editDialog .editForm textarea,
+  #editDialog .editForm select {
+    padding: 8px 10px;
+  }
+  #editDialog .editForm textarea {
+    min-height: 46px;
+  }
+  #editDialog .editForm textarea.queue {
+    min-height: 50px;
+  }
+  #editDialog .editForm .sw {
+    width: 27px;
+    height: 27px;
+  }
 }
