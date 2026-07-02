@@ -1,4 +1,4 @@
-const TANE_VERSION = "v8.3";
+const TANE_VERSION = "v8.4";
 const COLORS = ["#7EDBD9", "#FFA6C5", "#BCEED8", "#BFD8FF", "#D8CBFF", "#FFF2B8", "#FFC48D", "#CAE96B"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -88,15 +88,21 @@ function createCard(card, index) {
   const item = row.querySelector(".item");
   const action = row.querySelector(".action");
   let startX = 0;
+  let startY = 0;
   let dx = 0;
+  let dy = 0;
   let moved = false;
+  let scrollLocked = false;
   let longPressed = false;
   let timer = null;
 
   item.addEventListener("touchstart", e => {
     startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
     dx = 0;
+    dy = 0;
     moved = false;
+    scrollLocked = false;
     longPressed = false;
     item.classList.add("pressing");
     timer = setTimeout(() => {
@@ -115,11 +121,24 @@ function createCard(card, index) {
 
   item.addEventListener("touchmove", e => {
     dx = e.touches[0].clientX - startX;
-    if (Math.abs(dx) > 8) {
+    dy = e.touches[0].clientY - startY;
+
+    // 10px以上動いたらスクロール/スワイプ扱い。タップ編集は開かない。
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
       moved = true;
+      scrollLocked = true;
       clearTimeout(timer);
       item.classList.remove("pressing", "holdReady");
     }
+
+    // 縦スクロールを優先
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+      row.classList.remove("dragging");
+      row.style.setProperty("--drag", "0");
+      item.style.transform = "";
+      return;
+    }
+
     if (dx > 0) {
       const move = Math.max(0, Math.min(dx, window.innerWidth * 0.5));
       const progress = Math.min(1, move / (window.innerWidth * 0.34));
@@ -136,12 +155,12 @@ function createCard(card, index) {
     row.style.setProperty("--drag", "0");
     item.style.transform = "";
     if (longPressed) return;
-    if (dx > window.innerWidth * 0.28) {
+    if (!scrollLocked && dx > window.innerWidth * 0.28) {
       nextIndex = index;
       openNext();
       return;
     }
-    if (!moved) openEdit(index);
+    if (!moved && !scrollLocked) openEdit(index);
   });
 
   action.onclick = () => {

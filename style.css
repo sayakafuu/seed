@@ -1002,3 +1002,45 @@ dialog[open] {
     flex-basis: 24px;
   }
 }
+
+/* v8.4：スクロール時の誤編集防止・拡大表示対策 */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+.item,
+.row,
+.group,
+header,
+main {
+  touch-action: manipulation;
+}
+
+input,
+textarea,
+select {
+  touch-action: manipulation;
+  font-size: 16px; /* iPhone Safariの入力時ズーム防止 */
+}
+
+.item {
+  -webkit-user-drag: none;
+}
+
+#app,
+.group,
+.list,
+.item,
+.inner {
+  max-width: 100%;
+}
