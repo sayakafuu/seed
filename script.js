@@ -1,4 +1,4 @@
-const TANE_VERSION = "v9.2";
+const TANE_VERSION = "v9.4";
 const COLORS = ["#F46A87", "#FF8798", "#FFA28C", "#FFC06E", "#FFE08A", "#B7D7A8", "#89D8C9", "#C89BEA"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -88,7 +88,6 @@ function render() {
     const catName = typeof category === "string" ? category : category.name;
     const catColor = typeof category === "string" ? COLORS[0] : category.color;
     const cards = state.cards.filter(card => card.category === catName);
-    if (!cards.length) return;
     const section = document.createElement("section");
     section.className = "group";
     section.style.setProperty("--groupColor", catColor);
@@ -97,7 +96,16 @@ function render() {
       <div class="list"></div>
     `;
     const list = section.querySelector(".list");
-    cards.forEach(card => list.appendChild(createCard(card, state.cards.indexOf(card))));
+    if (cards.length) {
+      cards.forEach(card => list.appendChild(createCard(card, state.cards.indexOf(card))));
+    } else {
+      const empty = document.createElement("button");
+      empty.type = "button";
+      empty.className = "emptyCategoryAdd";
+      empty.textContent = "＋ 追加";
+      empty.onclick = () => openEdit(null, catName);
+      list.appendChild(empty);
+    }
     app.appendChild(section);
   });
 }
@@ -154,8 +162,8 @@ function createCard(card, index) {
       setTimeout(() => {
         item.classList.remove("holdReady");
         openFinish();
-      }, 180);
-    }, 760);
+      }, 320);
+    }, 860);
   }, { passive: true });
 
   item.addEventListener("touchmove", e => {
@@ -196,9 +204,11 @@ function createCard(card, index) {
     if (longPressed) return;
     if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
       nextIndex = index;
+      item.classList.add("swipeAccepted");
       setTimeout(() => {
+        item.classList.remove("swipeAccepted");
         requestAnimationFrame(() => openNext());
-      }, 110);
+      }, 130);
       return;
     }
     if (!moved && !tapCancelled) openEdit(index);
@@ -243,7 +253,7 @@ function openEdit(index, category) {
       <label>色</label>
       <div id="colors" class="colors"></div>
       <div class="btns">
-        <button class="btn" value="cancel" type="button" onclick="editDialog.close()">キャンセル</button>
+        <button class="btn" value="cancel" type="button" onclick="releaseFocus(); editDialog.close()">キャンセル</button>
         <button class="btn ok" type="button" onclick="saveEdit()">保存</button>
       </div>
     </form>
@@ -295,6 +305,7 @@ function saveEdit() {
   if (editIndex === null) state.cards.unshift(card);
   else state.cards[editIndex] = card;
   save();
+  releaseFocus();
   editDialog.close();
   render();
 }
@@ -545,6 +556,15 @@ function deleteCategoryNow(){
   save(); categoryDeleteDialog.close(); categoryEditDialog.close(); drawCategoryList(); render();
 }
 
+
+function releaseFocus() {
+  const active = document.activeElement;
+  if (active && typeof active.blur === "function") active.blur();
+  window.scrollTo(window.scrollX, window.scrollY);
+  document.body.style.transform = "none";
+  document.documentElement.style.transform = "none";
+}
+
 function vibrate(pattern) {
   if (navigator.vibrate) navigator.vibrate(pattern);
 }
@@ -552,4 +572,7 @@ function vibrate(pattern) {
 addTop.onclick = () => openEdit(null);
 settingsBtn.onclick = openCategories;
 archiveBtn.onclick = showArchive;
+editDialog.addEventListener("close", releaseFocus);
+nextDialog.addEventListener("close", releaseFocus);
+finishDialog.addEventListener("close", releaseFocus);
 render();
