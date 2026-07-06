@@ -406,8 +406,7 @@ function showArchive() {
           <span class="oldTitle">${h(card.title)}</span>
           ${card.current ? `<span class="oldNow">${h(card.current)}</span>` : ""}
         </span>
-        <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>
-      `;
+        <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>\n        <button class="oldDel" type="button" onclick="deleteArchiveCard(${state.archive.indexOf(card)})">🗑️</button>\n      `;
       list.appendChild(row);
     });
   }
@@ -576,3 +575,5 @@ editDialog.addEventListener("close", releaseFocus);
 nextDialog.addEventListener("close", releaseFocus);
 finishDialog.addEventListener("close", releaseFocus);
 render();
+
+function deleteArchiveCard(index){if(!confirm("この項目を削除しますか？"))return;state.archive.splice(index,1);save();showArchive();}
