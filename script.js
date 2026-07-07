@@ -1,4 +1,4 @@
-const TANE_VERSION = "v9.4";
+const TANE_VERSION = "v9.6";
 const COLORS = ["#F46A87", "#FF8798", "#FFA28C", "#FFC06E", "#FFE08A", "#B7D7A8", "#89D8C9", "#C89BEA"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -198,19 +198,28 @@ function createCard(card, index) {
   item.addEventListener("touchend", () => {
     clearTimeout(timer);
     item.classList.remove("pressing", "holdReady");
+    if (longPressed) {
+      row.classList.remove("dragging");
+      row.style.setProperty("--drag", "0");
+      item.style.transform = "";
+      return;
+    }
+    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
+      nextIndex = index;
+      const keepX = Math.max(0, Math.min(dx, window.innerWidth * 0.5));
+      row.classList.add("swipeLock");
+      row.classList.remove("dragging");
+      row.style.setProperty("--drag", "0");
+      item.style.transform = `translate3d(${keepX}px,0,0)`;
+      item.classList.add("swipeAccepted");
+      setTimeout(() => {
+        requestAnimationFrame(() => openNext());
+      }, 90);
+      return;
+    }
     row.classList.remove("dragging");
     row.style.setProperty("--drag", "0");
     item.style.transform = "";
-    if (longPressed) return;
-    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
-      nextIndex = index;
-      item.classList.add("swipeAccepted");
-      setTimeout(() => {
-        item.classList.remove("swipeAccepted");
-        requestAnimationFrame(() => openNext());
-      }, 130);
-      return;
-    }
     if (!moved && !tapCancelled) openEdit(index);
   });
 
@@ -406,7 +415,9 @@ function showArchive() {
           <span class="oldTitle">${h(card.title)}</span>
           ${card.current ? `<span class="oldNow">${h(card.current)}</span>` : ""}
         </span>
-        <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>\n        <button class="oldDel" type="button" onclick="deleteArchiveCard(${state.archive.indexOf(card)})">🗑️</button>\n      `;
+        <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>
+        <button class="oldDel" type="button" onclick="deleteArchiveCard(${state.archive.indexOf(card)})">×</button>
+      `;
       list.appendChild(row);
     });
   }
@@ -572,7 +583,7 @@ addTop.onclick = () => openEdit(null);
 settingsBtn.onclick = openCategories;
 archiveBtn.onclick = showArchive;
 editDialog.addEventListener("close", releaseFocus);
-nextDialog.addEventListener("close", releaseFocus);
+nextDialog.addEventListener("close", () => { releaseFocus(); render(); });
 finishDialog.addEventListener("close", releaseFocus);
 render();
 
