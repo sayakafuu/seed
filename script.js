@@ -1,4 +1,4 @@
-const TANE_VERSION = "v10.0";
+const TANE_VERSION = "v10.1";
 const COLORS = ["#F46A87", "#FF8798", "#FFA28C", "#FFC06E", "#FFE08A", "#B7D7A8", "#89D8C9", "#C89BEA"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
@@ -92,7 +92,7 @@ function render() {
     section.className = "group";
     section.style.setProperty("--groupColor", catColor);
     section.innerHTML = `
-      <div class="groupHead"><div class="groupName">${h(catName)}</div></div>
+      <div class="groupHead"><div class="groupName">${h(catName)}</div><div class="groupLine" aria-hidden="true"></div></div>
       <div class="list"></div>
     `;
     const list = section.querySelector(".list");
@@ -198,34 +198,19 @@ function createCard(card, index) {
   item.addEventListener("touchend", () => {
     clearTimeout(timer);
     item.classList.remove("pressing", "holdReady");
-
-    if (longPressed) {
-      row.classList.remove("dragging", "swipeLock");
-      row.style.setProperty("--drag", "0");
-      item.style.transform = "";
-      item.style.transition = "";
-      return;
-    }
-
-    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
-      nextIndex = index;
-      row.classList.add("swipeLock");
-      row.classList.remove("dragging");
-      row.style.setProperty("--drag", "0");
-      const keepX = Math.max(0, Math.min(dx, window.innerWidth * 0.5));
-      item.style.transition = "transform .22s cubic-bezier(.22,1,.36,1), opacity .16s ease";
-      item.style.transform = `translate3d(${Math.max(keepX, window.innerWidth * 0.62)}px,0,0)`;
-      item.classList.add("swipeAccepted");
-      setTimeout(() => {
-        openNext();
-      }, 150);
-      return;
-    }
-
-    row.classList.remove("dragging", "swipeLock");
+    row.classList.remove("dragging");
     row.style.setProperty("--drag", "0");
     item.style.transform = "";
-    item.style.transition = "";
+    if (longPressed) return;
+    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
+      nextIndex = index;
+      item.classList.add("swipeAccepted");
+      setTimeout(() => {
+        item.classList.remove("swipeAccepted");
+        requestAnimationFrame(() => openNext());
+      }, 130);
+      return;
+    }
     if (!moved && !tapCancelled) openEdit(index);
   });
 
@@ -416,22 +401,12 @@ function showArchive() {
       row.className = "oldRow";
       row.style.setProperty("--archiveColor", card.color || categoryColor(card.category));
       row.innerHTML = `
-        <span class="archiveFlower" aria-hidden="true">
-          <svg viewBox="0 0 36 36">
-            <circle class="petal" cx="18" cy="8.5" r="7.2"></circle>
-            <circle class="petal" cx="27" cy="15.2" r="7.2"></circle>
-            <circle class="petal" cx="23.5" cy="26" r="7.2"></circle>
-            <circle class="petal" cx="12.5" cy="26" r="7.2"></circle>
-            <circle class="petal" cx="9" cy="15.2" r="7.2"></circle>
-            <circle class="center" cx="18" cy="18" r="5"></circle>
-          </svg>
-        </span>
+        <span class="archiveFlower" aria-hidden="true">✿</span>
         <span class="oldText">
           <span class="oldTitle">${h(card.title)}</span>
           ${card.current ? `<span class="oldNow">${h(card.current)}</span>` : ""}
         </span>
         <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>
-        <button class="oldDel" type="button" onclick="deleteArchiveCard(${state.archive.indexOf(card)})" aria-label="削除">×</button>
       `;
       list.appendChild(row);
     });
@@ -598,8 +573,6 @@ addTop.onclick = () => openEdit(null);
 settingsBtn.onclick = openCategories;
 archiveBtn.onclick = showArchive;
 editDialog.addEventListener("close", releaseFocus);
-nextDialog.addEventListener("close", () => { releaseFocus(); render(); });
+nextDialog.addEventListener("close", releaseFocus);
 finishDialog.addEventListener("close", releaseFocus);
 render();
-
-function deleteArchiveCard(index){if(!confirm("この項目を削除しますか？"))return;state.archive.splice(index,1);save();showArchive();}
