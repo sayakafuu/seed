@@ -1,5 +1,5 @@
-const TANE_VERSION = "v10.1";
-const COLORS = ["#F46A87", "#FF8798", "#FFA28C", "#FFC06E", "#FFE08A", "#B7D7A8", "#89D8C9", "#C89BEA"];
+const TANE_VERSION = "v11.0";
+const COLORS = ["#EF5D9D", "#F45A78", "#FF6F67", "#FFC44D", "#B8DA3B", "#5BC8C2", "#56B7E8", "#B783E6"];
 const STORAGE_KEY = "tane_v6_plan_queue";
 
 const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || {
@@ -198,19 +198,29 @@ function createCard(card, index) {
   item.addEventListener("touchend", () => {
     clearTimeout(timer);
     item.classList.remove("pressing", "holdReady");
-    row.classList.remove("dragging");
-    row.style.setProperty("--drag", "0");
-    item.style.transform = "";
-    if (longPressed) return;
-    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
-      nextIndex = index;
-      item.classList.add("swipeAccepted");
-      setTimeout(() => {
-        item.classList.remove("swipeAccepted");
-        requestAnimationFrame(() => openNext());
-      }, 130);
+    if (longPressed) {
+      row.classList.remove("dragging", "swipeLock");
+      row.style.setProperty("--drag", "0");
+      item.style.transform = "";
+      item.style.transition = "";
       return;
     }
+    if (dx > window.innerWidth * 0.28 && Math.abs(dx) > Math.abs(dy)) {
+      nextIndex = index;
+      row.classList.add("swipeLock");
+      row.classList.remove("dragging");
+      row.style.setProperty("--drag", "0");
+      const startX = Math.max(0, Math.min(dx, window.innerWidth * 0.5));
+      item.style.transition = "transform .18s cubic-bezier(.22,1,.36,1), opacity .12s ease";
+      item.style.transform = `translate3d(${Math.max(startX, window.innerWidth * 0.72)}px,0,0)`;
+      item.classList.add("swipeAccepted");
+      setTimeout(() => openNext(), 125);
+      return;
+    }
+    row.classList.remove("dragging", "swipeLock");
+    row.style.setProperty("--drag", "0");
+    item.style.transform = "";
+    item.style.transition = "";
     if (!moved && !tapCancelled) openEdit(index);
   });
 
@@ -381,12 +391,28 @@ function finishCard() {
   }
 }
 
+function flowerSvg() {
+  return `
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <circle class="petal" cx="20" cy="8.6" r="7.4"></circle>
+      <circle class="petal" cx="30.8" cy="16.4" r="7.4"></circle>
+      <circle class="petal" cx="26.8" cy="29" r="7.4"></circle>
+      <circle class="petal" cx="13.2" cy="29" r="7.4"></circle>
+      <circle class="petal" cx="9.2" cy="16.4" r="7.4"></circle>
+      <circle class="center" cx="20" cy="20" r="4.2"></circle>
+      <circle class="dot" cx="20" cy="13.9" r="1.35"></circle>
+      <circle class="dot" cx="25.8" cy="18.2" r="1.35"></circle>
+      <circle class="dot" cx="23.5" cy="25" r="1.35"></circle>
+      <circle class="dot" cx="16.5" cy="25" r="1.35"></circle>
+      <circle class="dot" cx="14.2" cy="18.2" r="1.35"></circle>
+    </svg>`;
+}
+
 function showArchive() {
   archiveDialog.innerHTML = `
     <form method="dialog" class="dialogForm archiveForm">
-      <div class="archiveTop">
+      <div class="archiveTop noTitle">
         <button type="button" class="backBtn" onclick="archiveDialog.close()">‹</button>
-        <h2>保管庫</h2>
       </div>
       <div id="archiveList"></div>
     </form>
@@ -395,18 +421,19 @@ function showArchive() {
   if (!state.archive.length) {
     list.innerHTML = `<div class="empty">まだありません</div>`;
   } else {
-    state.archive.forEach(card => {
+    state.archive.forEach((card, archiveIndex) => {
       normalizeCard(card);
       const row = document.createElement("div");
       row.className = "oldRow";
       row.style.setProperty("--archiveColor", card.color || categoryColor(card.category));
       row.innerHTML = `
-        <span class="archiveFlower" aria-hidden="true">✿</span>
+        <span class="archiveFlower" aria-hidden="true">${flowerSvg()}</span>
         <span class="oldText">
           <span class="oldTitle">${h(card.title)}</span>
           ${card.current ? `<span class="oldNow">${h(card.current)}</span>` : ""}
         </span>
         <time class="oldDate">${formatArchiveDate(card.archivedAt)}</time>
+        <button class="oldDel" type="button" onclick="deleteArchiveCard(${archiveIndex})" aria-label="削除">×</button>
       `;
       list.appendChild(row);
     });
@@ -573,6 +600,8 @@ addTop.onclick = () => openEdit(null);
 settingsBtn.onclick = openCategories;
 archiveBtn.onclick = showArchive;
 editDialog.addEventListener("close", releaseFocus);
-nextDialog.addEventListener("close", releaseFocus);
+nextDialog.addEventListener("close", () => { releaseFocus(); render(); });
 finishDialog.addEventListener("close", releaseFocus);
 render();
+
+function deleteArchiveCard(index){if(!confirm("この項目を削除しますか？"))return;state.archive.splice(index,1);save();showArchive();}
